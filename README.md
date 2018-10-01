@@ -33,3 +33,12 @@ When you are done, you can use the `exit` command to get out of the virtual mach
     $ exit
     $ vagrant halt
 ```
+
+
+If the VM is no longer needed you can remove it with from your computer to free up disk space with:
+
+```
+    $ vagrant destroy
+```
+
+This repo is part of the NYU masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created by John Rofrano.
