@@ -80,5 +80,19 @@ Vagrant.configure(2) do |config|
       args: "--restart=always -d --name my_psql -h postgres -p 5432:5432 -v /var/lib/psql/data:/data"
   end
 
+<<<<<<< HEAD
+=======
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y git python-pip python2.7-dev build-essential
+    apt-get -y autoremove
+    #pip install --upgrade pip
+    # Install app dependencies
+    cd /vagrant
+    pip install -r requirements.txt
+  SHELL
+ 
+>>>>>>> 9be533e386e47a127faa3a178b7f23fc32e427f5
 
 end
