@@ -9,8 +9,6 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
-
-  config.vm.synced_folder "src/", "/share_folder", create: true
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
 
@@ -61,9 +59,9 @@ Vagrant.configure(2) do |config|
     pip install -r requirements.txt
   SHELL
 
+    #build shared directory with vagrant  
+  config.vm.synced_folder "src/", "/share_folder", create: true
 
-  #build shared directory with vagrant
-  #must behind installation of python; otherwise python will become python3
   config.vm.provision "docker" do |d|
     d.build_image "/share_folder/flask",
       args: "-t flask-image:latest" 
@@ -73,9 +71,6 @@ Vagrant.configure(2) do |config|
     d.run "postgres", 
       #args: "-it postgres psql -h postgres -p 5432:5432 -U"
       args: "--restart=always -d --name my_psql -h postgres -p 5432:5432 -v /var/lib/psql/data:/data"
-  end  
-  
-
-  
+  end
 
 end

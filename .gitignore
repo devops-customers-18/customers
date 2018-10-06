@@ -106,4 +106,8 @@ venv.bak/
 
 # vagrant
 .vagrant/*
+<<<<<<< HEAD
 vm/.vagrant/*
+=======
+*/.vagrant/*
+>>>>>>> 1e6324a8c9e2eaac7d641225302ef25f636d85ac
