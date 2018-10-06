@@ -1,0 +1,1 @@
+{"virtualbox":{"/share_folder":{"create":true,"guestpath":"/share_folder","hostpath":"/Users/kevinyang/Courses/Fall_2018/DevOps/customers/vm/src","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/kevinyang/Courses/Fall_2018/DevOps/customers/vm","disabled":false,"__vagrantfile":true}}}
