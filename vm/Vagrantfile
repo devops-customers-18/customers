@@ -8,28 +8,17 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  #config.vm.box = "ubuntu/trusty64"
   config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "restful"
 
-  #build shared directory with vagrant
   config.vm.synced_folder "src/", "/share_folder", create: true
-
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
 
   # Forward PostgreSQL port
-  config.vm.network "forwarded_port", guest: 5432, host: 5432, auto_correct: true
+  config.vm.network "forwarded_port", guest: 5432, host: 5432, host_ip: "127.0.0.1"
 
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
   config.vm.network "private_network", ip: "192.168.33.10"
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
     vb.memory = "256"
@@ -44,35 +33,27 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
   end
 
-  # Copy the ssh keys into the vm for git access
+  # Copy your ssh keys for github so that your git credentials work
   if File.exists?(File.expand_path("~/.ssh/id_rsa"))
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
 
-  if File.exists?(File.expand_path("~/.ssh/id_rsa.pub"))
-    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-  end
-
-  # Copy your .vimrc file so that your vi looks like you expect
+  # Copy your ~/.vimrc file so that vi looks the same
   if File.exists?(File.expand_path("~/.vimrc"))
     config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
   end
 
-  # Copy your ~/.vimrc file so that vi looks the same
-  if Dir.exists?(File.expand_path("~/.vim"))
-    config.vm.provision "file", source: "~/.vim", destination: "~/.vim"
-  end
+  # Windows users need to change the permission of files and directories
+  # so that nosetests runs without extra arguments.
+  # Mac users can comment this next line out
+  config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-
-  #The following script is to use docker provisioning to prepare docker container for our app:
-  #will need --link a:b to connect one container with another.
-
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y git python-pip python2.7-dev build-essential
+    apt-get install -y git python-pip python-dev build-essential
     apt-get -y autoremove
     #pip install --upgrade pip
     # Install app dependencies
@@ -80,15 +61,21 @@ Vagrant.configure(2) do |config|
     pip install -r requirements.txt
   SHELL
 
+
+  #build shared directory with vagrant
+  #must behind installation of python; otherwise python will become python3
   config.vm.provision "docker" do |d|
     d.build_image "/share_folder/flask",
-      args: "-t flask-image:latest"
+      args: "-t flask-image:latest" 
     d.run "flask-image",
-      args: "--restart=always -d -h flask_image -p 5000:5000"
+      args: "--restart=always -d -h flask_image -p 5000:5000" 
     d.pull_images "postgres"
-    d.run "postgres",
+    d.run "postgres", 
       #args: "-it postgres psql -h postgres -p 5432:5432 -U"
       args: "--restart=always -d --name my_psql -h postgres -p 5432:5432 -v /var/lib/psql/data:/data"
-  end
+  end  
+  
+
+  
 
 end
