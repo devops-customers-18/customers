@@ -8,7 +8,7 @@ import os
 from app import app, service
 
 # Pull options from environment
-DEBUG = (os.getenv('DEBUG', 'False') == 'True')
+DEBUG = (os.getenv('DEBUG', 'True') == 'True')
 PORT = os.getenv('PORT', '5000')
 
 ######################################################################
