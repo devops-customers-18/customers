@@ -1,0 +1,4 @@
+# Dependencies
+Flask==1.0.2
+Flask-API==1.0
+
