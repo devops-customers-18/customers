@@ -106,3 +106,4 @@ venv.bak/
 
 # vagrant
 .vagrant/*
+vm/.vagrant/*
