@@ -13,7 +13,7 @@ Clone the project to your development folder and create your Vagrant vm
 
 ```
     $ git clone https://github.com/devops-customers-18/customers.git
-    $ cd customers
+    $ cd customers/vm
     $ vagrant up
 ```
 
@@ -21,7 +21,7 @@ Once the VM is up you can use it with:
 
 ```
     $ vagrant ssh
-    $ cd /vagrant
+    $ cd /share_folder/flask
     $ python run.py
 ```
 
