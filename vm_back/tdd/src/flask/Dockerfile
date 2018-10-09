@@ -14,6 +14,6 @@ RUN pip install -r requirements.txt
 
 COPY . /home/vagrant
 
-ENTRYPOINT [ "python" ]
+#ENTRYPOINT [ "python" ]
 
-CMD [ "run.py" ]
+#CMD [ "app.py" ]
