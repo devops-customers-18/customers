@@ -9,8 +9,6 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
-
-  config.vm.synced_folder "src/", "/share_folder", create: true
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
 
@@ -48,7 +46,6 @@ Vagrant.configure(2) do |config|
   # Mac users can comment this next line out
   config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
 
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -63,6 +60,8 @@ Vagrant.configure(2) do |config|
   SHELL
 
     #build shared directory with vagrant  
+  config.vm.synced_folder "src/", "/share_folder", create: true
+
   config.vm.provision "docker" do |d|
     d.build_image "/share_folder/flask",
       args: "-t flask-image:latest" 
@@ -73,24 +72,5 @@ Vagrant.configure(2) do |config|
       #args: "-it postgres psql -h postgres -p 5432:5432 -U"
       args: "--restart=always -d --name my_psql -h postgres -p 5432:5432 -v /var/lib/psql/data:/data"
   end
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt-get install -y git python-pip python2.7-dev build-essential
-    apt-get -y autoremove
-    #pip install --upgrade pip
-    # Install app dependencies
-    cd /vagrant
-    pip install -r requirements.txt
-  SHELL
- 
->>>>>>> 9be533e386e47a127faa3a178b7f23fc32e427f5
-=======
-  
->>>>>>> 90d551cfc7f846058b965b8287311e40d416767f
 
 end
