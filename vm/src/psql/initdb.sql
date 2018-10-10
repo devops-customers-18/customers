@@ -14,5 +14,6 @@ CREATE TABLE IF NOT EXISTS Users (
     Address TEXT,
     Phone_Number VARCHAR(20),
     Title VARCHAR(20),
+    Active BOOLEAN NOT NULL,
     PRIMARY KEY (Id)
 );
