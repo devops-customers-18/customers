@@ -30,6 +30,7 @@ DELETE /pets{id} - Removes a Pet from the database that matches the id
 import os
 import sys
 import logging
+from database import db_connect
 from flask import Response, jsonify, request, json, url_for, make_response
 from . import app
 from models import Pet, DataValidationError
@@ -45,6 +46,10 @@ HTTP_204_NO_CONTENT = 204
 HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
+
+# Postgres connection.
+connection = db_connect()
+
 
 ######################################################################
 # Error Handlers
@@ -86,6 +91,11 @@ def index():
     return jsonify(name='Pet Demo REST API Service',
                    version='1.0',
                    url=url_for('list_pets', _external=True)), HTTP_200_OK
+
+# Customers starts here.
+
+
+
 
 ######################################################################
 # LIST ALL PETS

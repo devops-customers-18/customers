@@ -48,7 +48,6 @@ Vagrant.configure(2) do |config|
   # Mac users can comment this next line out
   config.vm.synced_folder ".", "/vagrant", mount_options: ["dmode=775,fmode=664"]
 
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -59,21 +58,27 @@ Vagrant.configure(2) do |config|
     #pip install --upgrade pip
     # Install app dependencies
     cd /vagrant
-    pip install -r requirements.txt
+    pip install -r /share_folder/requirements.txt
   SHELL
 
-    #build shared directory with vagrant  
+  #build shared directory with vagrant
+  #must behind installation of python; otherwise python will become python3
   config.vm.provision "docker" do |d|
     d.build_image "/share_folder/flask",
       args: "-t flask-image:latest" 
     d.run "flask-image",
-      args: "--restart=always -d -h flask_image -p 5000:5000" 
-    d.pull_images "postgres"
-    d.run "postgres", 
-      #args: "-it postgres psql -h postgres -p 5432:5432 -U"
-      args: "--restart=always -d --name my_psql -h postgres -p 5432:5432 -v /var/lib/psql/data:/data"
-  end
+      args: "--restart=always -d -h flask_image -p 5000:5000/tcp" 
+    d.build_image "/share_folder/psql",
+      args: "-t psql-image:latest" 
+    d.run "psql-image", 
+      args: "--restart=always -d --name my_psql -h postgres -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data" 
+    #d.pull_images "postgres"
+  end 
 
-  
+  config.vm.provision "shell", inline: <<-INITDB
+    apt-get install -y postgresql
+    psql -h 0.0.0.0  -p 5432 -U postgres -f /share_folder/psql/initdb.sql
+INITDB
+ 
 
 end
