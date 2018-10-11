@@ -108,3 +108,4 @@ venv.bak/
 .vagrant/*
 vm/.vagrant/*
 */.vagrant/*
+vm_back/*
