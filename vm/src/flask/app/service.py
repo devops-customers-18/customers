@@ -50,6 +50,10 @@ HTTP_409_CONFLICT = 409
 # Postgres connection.
 connection = db_connect()
 
+# cursor.execute(query)
+# one = cursor.fetch_one()
+# all = cursor.fetch_all()
+# cursor.commit()
 
 ######################################################################
 # Error Handlers
