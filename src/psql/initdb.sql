@@ -3,6 +3,7 @@ CREATE DATABASE customers ;
 \c customers;
 
 CREATE TABLE IF NOT EXISTS Users (
+    Id SERIAL PRIMARY KEY,
     First_Name VARCHAR(20) NOT NULL,
     Last_Name VARCHAR(20) NOT NULL,
     Username VARCHAR(255) NOT NULL,
@@ -16,4 +17,5 @@ CREATE TABLE IF NOT EXISTS Users (
 
 
 GRANT ALL PRIVILEGES ON users TO tester;
+GRANT USAGE, SELECT ON SEQUENCE users_id_seq TO tester;
 
