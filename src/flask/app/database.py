@@ -17,5 +17,3 @@ def db_connect():
         print("Database connection exception.")
         print(e)
     return None
-
-db_connect()

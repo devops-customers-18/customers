@@ -32,6 +32,7 @@ import sys
 import logging
 from database import db_connect
 from flask import Response, jsonify, request, json, url_for, make_response
+from flask import render_template
 from . import app
 from models import Pet, DataValidationError
 
@@ -92,11 +93,30 @@ def internal_server_error(error):
 @app.route('/')
 def index():
     """ Return something useful by default """
-    return jsonify(name='Pet Demo REST API Service',
+    data = jsonify(name='Pet Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True)), HTTP_200_OK
+                   url=url_for('list_pets', _external=True))
+    customers = { 'user1': 'Sam' }
+    return render_template('index.html', data=data, customers=customers)
 
 # Customers starts here.
+
+
+######################################################################
+# ADD A NEW CUSTOMER
+######################################################################
+# @app.route('/customers', methods=['POST'])
+# def create_pets():
+#     """Create a customer in the database."""
+#     app.logger.info('Creating a new pet')
+#     payload = request.get_json()
+#     pet = Pet()
+#     pet.deserialize(payload)
+#     pet.save()
+#     message = pet.serialize()
+#     response = make_response(jsonify(message), HTTP_201_CREATED)
+#     response.headers['Location'] = url_for('get_pets', id=pet.id, _external=True)
+#     return response
 
 
 
@@ -141,14 +161,33 @@ def get_pets(id):
 def create_pets():
     """ Creates a Pet in the datbase from the posted database """
     app.logger.info('Creating a new pet')
-    payload = request.get_json()
-    pet = Pet()
-    pet.deserialize(payload)
-    pet.save()
-    message = pet.serialize()
-    response = make_response(jsonify(message), HTTP_201_CREATED)
-    response.headers['Location'] = url_for('get_pets', id=pet.id, _external=True)
-    return response
+    req = request.get_json()
+    response = {'message': 'good request'}
+    email = req['Email'] if 'Email' in req else 'NULL'
+    address = req['Address'] if 'Address' in req else 'NULL'
+    phone_num = req['Phone_Number'] if 'Phone_Number' in req else 'NULL'
+    title = req['Title'] if 'Title' in req else 'NULL'
+    try:
+        cursor = connection.cursor()
+        query = 'INSERT INTO users \
+                 (First_Name, Last_Name, Username, \
+                  Password, Email, Address, Phone_Number, \
+                  Title, Active) \
+                  VALUES (%s, %s, %s, %s, \
+                          %s, %s, %s, %s, %s);'
+        cursor.execute(query, (req['First_Name'],
+                               req['Last_Name'], req['Username'],
+                               req['Password'], email, address, 
+                               phone_num, title, 'TRUE'))
+        connection.commit()
+        cursor.close()
+        return_code = HTTP_201_CREATED
+        print "success"
+    except Exception as e:
+        response['message'] = 'Missing Information'
+        return_code = HTTP_204_NO_CONTENT
+        print e
+    return jsonify(response), return_code
 
 ######################################################################
 # UPDATE AN EXISTING PET
