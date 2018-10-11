@@ -157,7 +157,7 @@ def get_pets(id):
 ######################################################################
 # ADD A NEW PET
 ######################################################################
-@app.route('/pets', methods=['POST'])
+@app.route('/customers', methods=['POST'])
 def create_pets():
     """ Creates a Pet in the datbase from the posted database """
     app.logger.info('Creating a new pet')
