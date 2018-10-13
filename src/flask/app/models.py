@@ -120,13 +120,13 @@ class Customer(object):
         return cls.data
 
     @classmethod
-    def find(cls, pet_id):
-        """ Finds a Pet by it's ID """
+    def find(cls, customer_id):
+        """ Finds a Customer by it's ID """
         if not cls.data:
             return None
-        pets = [pet for pet in cls.data if pet.id == pet_id]
-        if pets:
-            return pets[0]
+        customers = [customer for customer in cls.data if customer.id == customer_id]
+        if customers:
+            return customers[0]
         return None
 
     @classmethod

@@ -191,22 +191,22 @@ def get_pets(id):
 #     return jsonify(response), return_code
 
 ######################################################################
-# UPDATE AN EXISTING PET
+# UPDATE AN EXISTING CUSTOMER
 ######################################################################
-@app.route('/pets/<int:id>', methods=['PUT'])
+@app.route('/customers/<int:id>', methods=['PUT'])
 def update_pets(id):
     """ Updates a Pet in the database fom the posted database """
-    app.logger.info('Updating a Pet with id [{}]'.format(id))
-    pet = Pet.find(id)
-    if pet:
-        payload = request.get_json()
-        pet.deserialize(payload)
-        pet.id = id
-        pet.save()
-        message = pet.serialize()
+    app.logger.info('Updating a Customer with id [{}]'.format(id))
+    customer = Customer.find(id)
+    if customer:
+        customer_info = request.get_json()
+        customer.deserialize(customer_info)
+        customer.id = id
+        customer.save()
+        message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Pet with id: %s was not found' % str(id)}
+        message = {'error' : 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
