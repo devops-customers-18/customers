@@ -27,21 +27,29 @@ class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
 
-class Pet(object):
+class Customer(object):
     """
-    Class that represents a Pet
+    Class that represents a Customer
 
-    This version uses an in-memory collection of pets for testing
+    This version uses an in-memory collection of customers for testing
     """
     lock = threading.Lock()
     data = []
     index = 0
 
-    def __init__(self, id=0, name='', category=''):
-        """ Initialize a Pet """
+    def __init__(self, id=0, name='', first_name='', last_name='',
+                 address='', email='', username='', password='',
+                 phone_number='', active=True):
+        """ Initialize a Customer. """
         self.id = id
-        self.name = name
-        self.category = category
+        self.first_name = first_name
+        self.last_name = last_name
+        self.address = address
+        self.email = email
+        self.username = username
+        self.password = password
+        self.phone_number = phone_number
+        self.active = active
 
     def save(self):
         """
@@ -49,20 +57,25 @@ class Pet(object):
         """
         if self.id == 0:
             self.id = self.__next_index()
-            Pet.data.append(self)
+            Customer.data.append(self)
         else:
-            for i in range(len(Pet.data)):
-                if Pet.data[i].id == self.id:
-                    Pet.data[i] = self
+            for i in range(len(Customer.data)):
+                if Customer.data[i].id == self.id:
+                    Customer.data[i] = self
                     break
+        
 
     def delete(self):
         """ Removes a Pet from the data store """
-        Pet.data.remove(self)
+        Customer.data.remove(self)
 
     def serialize(self):
         """ Serializes a Pet into a dictionary """
-        return {"id": self.id, "name": self.name, "category": self.category}
+        return {"id": self.id, "first_name": self.first_name,
+                "last_name": self.last_name, "address": self.address,
+                "email": self.email, "username": self.username,
+                "password": self.password, "phone_number": self.phone_number,
+                "active": self.active}
 
     def deserialize(self, data):
         """
@@ -72,12 +85,19 @@ class Pet(object):
             data (dict): A dictionary containing the Pet data
         """
         if not isinstance(data, dict):
-            raise DataValidationError('Invalid pet: body of request contained bad or no data')
+            raise DataValidationError('Invalid customer: body of request contained bad or no data')
         try:
-            self.name = data['name']
-            self.category = data['category']
+            self.id = data["id"]
+            self.first_name = data["first_name"]
+            self.last_name = data["last_name"]
+            self.address = data["address"]
+            self.email = data["email"]
+            self.username = data["username"]
+            self.password = data["password"]
+            self.phone_number = data["phone_number"]
+            self.active = data["active"]
         except KeyError as err:
-            raise DataValidationError('Invalid pet: missing ' + err.args[0])
+            raise DataValidationError('Invalid customer: missing ' + err.args[0])
         return
 
     @classmethod
@@ -100,13 +120,13 @@ class Pet(object):
         return cls.data
 
     @classmethod
-    def find(cls, pet_id):
-        """ Finds a Pet by it's ID """
+    def find(cls, customer_id):
+        """ Finds a Customer by it's ID """
         if not cls.data:
             return None
-        pets = [pet for pet in cls.data if pet.id == pet_id]
-        if pets:
-            return pets[0]
+        customers = [customer for customer in cls.data if customer.id == customer_id]
+        if customers:
+            return customers[0]
         return None
 
     @classmethod
