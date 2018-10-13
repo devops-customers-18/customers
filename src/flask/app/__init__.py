@@ -8,8 +8,7 @@ import logging
 from flask import Flask
 
 # Create Flask application
-app = Flask(__name__)
-
+app = Flask(__name__, template_folder='templates')
 import service
 
 # Set up logging for production
