@@ -37,7 +37,7 @@ class Customer(object):
     data = []
     index = 0
 
-    def __init__(self, id=0, name='', first_name='', last_name='',
+    def __init__(self, id=0, first_name='', last_name='',
                  address='', email='', username='', password='',
                  phone_number='', active=True):
         """ Initialize a Customer. """
