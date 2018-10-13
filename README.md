@@ -17,11 +17,13 @@ Clone the project to your development folder and create your Vagrant vm
     $ vagrant up
 ```
 
-Once the VM is up you can use it with:
 
+## Access Flask
+
+In the vm, run
 ```
     $ vagrant ssh
-    $ cd /share_folder/flask
+    $ cd /src/flask
     $ python run.py
 ```
 
