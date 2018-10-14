@@ -13,18 +13,18 @@
 # limitations under the License.
 
 """
-Pet Shop Demo
+Customer Shop Demo
 
 This is an example of a pet shop service written with Python Flask
 It demonstraits how a RESTful service should be implemented.
 
 Paths
 -----
-GET  /pets - Retrieves a list of pets from the database
-GET  /pets{id} - Retrirves a Pet with a specific id
-POST /pets - Creates a Pet in the datbase from the posted database
-PUT  /pets/{id} - Updates a Pet in the database fom the posted database
-DELETE /pets{id} - Removes a Pet from the database that matches the id
+GET  /customers - Retrieves a list of pets from the database
+GET  /customers{id} - Retrirves a Pet with a specific id
+POST /customers - Creates a Pet in the datbase from the posted database
+PUT  /customers/{id} - Updates a Pet in the database fom the posted database
+DELETE /customers{id} - Removes a Pet from the database that matches the id
 """
 
 import os
@@ -86,19 +86,15 @@ def internal_server_error(error):
     """ Handles catostrophic errors """
     return jsonify(status=500, error='Internal Server Error', message=error.message), 500
 
-
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route('/')
 def index():
     """ Return something useful by default """
-    data = jsonify(name='Pet Demo REST API Service',
+    return jsonify(name='Customers Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True))
-    customers = { 'user1': 'Sam' }
-    return render_template('index.html', data=data, customers=customers)
-
+                   url=url_for('list_pets', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 
@@ -106,7 +102,7 @@ def index():
 # ADD A NEW CUSTOMER
 ######################################################################
 @app.route('/customers', methods=['POST'])
-def create_pets():
+def create_customers():
     """Create a customer in the database."""
     app.logger.info('Creating a new customer')
     customer_info = request.get_json()
@@ -116,33 +112,26 @@ def create_pets():
     customer.save()
     message = customer.serialize()
     response = make_response(jsonify(message), HTTP_201_CREATED)
-    # response.headers['Location'] = url_for('get_pets', id=pet.id, _external=True)
+    response.headers['Location'] = url_for('get_customers', id=customer.id, _external=True)
     return response
-
-
-
 
 ######################################################################
 # LIST ALL PETS
 ######################################################################
-@app.route('/pets', methods=['GET'])
+@app.route('/customers', methods=['GET'])
 def list_pets():
-    """ Retrieves a list of pets from the database """
-    app.logger.info('Listing pets')
+    """ Retrieves a list of customers from the database """
+    app.logger.info('Listing customers')
     results = []
-    category = request.args.get('category')
-    if category:
-        results = Pet.find_by_category(category)
-    else:
-        results = Pet.all()
+    results = Customer.all()
 
-    return jsonify([pet.serialize() for pet in results]), HTTP_200_OK
+    return jsonify([customer.serialize() for customer in results]), HTTP_200_OK
 
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
 @app.route('/pets/<int:id>', methods=['GET'])
-def get_pets(id):
+def get_customers(id):
     """ Retrieves a Pet with a specific id """
     app.logger.info('Finding a Pet with id [{}]'.format(id))
     pet = Pet.find(id)
@@ -154,41 +143,6 @@ def get_pets(id):
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
-
-######################################################################
-# ADD A NEW PET
-######################################################################
-# @app.route('/customers', methods=['POST'])
-# def create_pets():
-#     """ Creates a Pet in the datbase from the posted database """
-#     app.logger.info('Creating a new pet')
-#     req = request.get_json()
-#     response = {'message': 'good request'}
-#     email = req['Email'] if 'Email' in req else 'NULL'
-#     address = req['Address'] if 'Address' in req else 'NULL'
-#     phone_num = req['Phone_Number'] if 'Phone_Number' in req else 'NULL'
-#     title = req['Title'] if 'Title' in req else 'NULL'
-#     try:
-#         cursor = connection.cursor()
-#         query = 'INSERT INTO users \
-#                  (First_Name, Last_Name, Username, \
-#                   Password, Email, Address, Phone_Number, \
-#                   Title, Active) \
-#                   VALUES (%s, %s, %s, %s, \
-#                           %s, %s, %s, %s, %s);'
-#         cursor.execute(query, (req['First_Name'],
-#                                req['Last_Name'], req['Username'],
-#                                req['Password'], email, address, 
-#                                phone_num, title, 'TRUE'))
-#         connection.commit()
-#         cursor.close()
-#         return_code = HTTP_201_CREATED
-#         print "success"
-#     except Exception as e:
-#         response['message'] = 'Missing Information'
-#         return_code = HTTP_204_NO_CONTENT
-#         print e
-#     return jsonify(response), return_code
 
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
