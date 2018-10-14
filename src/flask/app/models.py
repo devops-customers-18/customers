@@ -37,7 +37,6 @@ class Customer(object):
     data = []
     index = 0
 
-
     def __init__(self, id=0, first_name='', last_name='',
                  address='', email='', username='', password='',
                  phone_number='', active=True):
@@ -111,8 +110,8 @@ class Customer(object):
 
     @classmethod
     def all(cls):
-        """ Returns all of the Pets in the database """
-        return [pet for pet in cls.data]
+        """ Returns all of the Customers in the database """
+        return [customer for customer in cls.data]
 
     @classmethod
     def remove_all(cls):
