@@ -35,6 +35,7 @@ from flask import Response, jsonify, request, json, url_for, make_response
 from flask import render_template
 from . import app
 from models import Customer, DataValidationError
+#from urlparse3 import urlparse3
 
 # Pull options from environment
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
@@ -92,9 +93,9 @@ def internal_server_error(error):
 @app.route('/')
 def index():
     """ Return something useful by default """
-    return jsonify(name='Customers Demo REST API Service',
+    return jsonify(name='Customer Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True)), HTTP_200_OK
+                   url=url_for('list_customer', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 
@@ -112,41 +113,47 @@ def create_pets():
     customer.save()
     message = customer.serialize()
     response = make_response(jsonify(message), HTTP_201_CREATED)
-    response.headers['Location'] = url_for('get_customers', id=pet.id, _external=True)
+    response.headers['Location'] = url_for('get_customer', id=customer.id, _external=True)
     return response
 
 ######################################################################
-# LIST ALL PETS
+# LIST ALL CUSTOMER
 ######################################################################
-@app.route('/pets', methods=['GET'])
-def list_pets():
+@app.route('/customers', methods=['GET'])
+def list_customer():
     """ Retrieves a list of pets from the database """
     app.logger.info('Listing pets')
     results = []
     category = request.args.get('category')
     if category:
-        results = Pet.find_by_category(category)
+        results = Customer.find_by_category(category)
     else:
-        results = Pet.all()
+        results = Customer.all()
 
     return jsonify([pet.serialize() for pet in results]), HTTP_200_OK
 
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route('/pets/<int:id>', methods=['GET'])
-def get_pets(id):
-    """ Retrieves a Pet with a specific id """
+@app.route('/customers/<int:id>', methods=['GET'])
+def get_customer(id):
+    """ Retrieves a Customer with a specific id """
     app.logger.info('Finding a Pet with id [{}]'.format(id))
-    pet = Pet.find(id)
-    if pet:
-        message = pet.serialize()
+    customer = Customer.find(id)
+    if customer:
+        message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Pet with id: %s was not found' % str(id)}
+        message = {'error' : 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
+
+#def get_customer(url):
+#    """Retrieve a Customer with a set of query condition"""
+#    parsed_url = urlparse3.parse_url(url)
+#    query = parsed_url.query
+#    for key, value in query.items():
 
 ######################################################################
 # ADD A NEW PET
@@ -187,7 +194,7 @@ def get_pets(id):
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
 @app.route('/customers/<int:id>', methods=['PUT'])
-def update_pets(id):
+def update_customers(id):
     """ Updates a Pet in the database fom the posted database """
     app.logger.info('Updating a Customer with id [{}]'.format(id))
     customer = Customer.find(id)
@@ -205,15 +212,15 @@ def update_pets(id):
     return jsonify(message), return_code
 
 ######################################################################
-# DELETE A PET
+# DELETE A EXISTING CUSTOMER
 ######################################################################
-@app.route('/pets/<int:id>', methods=['DELETE'])
-def delete_pets(id):
+@app.route('/customers/<int:id>', methods=['DELETE'])
+def delete_customer(id):
     """ Removes a Pet from the database that matches the id """
     app.logger.info('Deleting a Pet with id [{}]'.format(id))
-    pet = Pet.find(id)
-    if pet:
-        pet.delete()
+    customer = Customer.find(id)
+    if customer:
+        customer.delete()
     return make_response('', HTTP_204_NO_CONTENT)
 
 
