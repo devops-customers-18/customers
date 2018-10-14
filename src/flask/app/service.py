@@ -123,6 +123,32 @@ def create_customers():
     response.headers['Location'] = url_for('get_customers', id=customer.id, _external=True)
     return response
 
+
+######################################################################
+# QUERY A CUSTOMER
+######################################################################
+
+
+@app.route('/customers', methods=['GET'])
+def query_customer():
+    app.logger.info('Query a Customer with query')
+    app.logger.info(list(request.args.items()))
+    app.logger.info(list(request.args.keys()))
+    app.logger.info(request.args.get('username'))
+    app.logger.info(request.args.get('active'))
+
+    if request.args:
+        costumer_list = [Customer.find_by_query(key, val) for key, val in request.args.items()]
+        costumer_set = set([costumer for costumer_list_i in costumer_list for costumer in costumer_list_i])
+        message = [costumer.serialize() for costumer in costumer_set]
+        return_code = HTTP_200_OK
+    else:
+        results = Customer.all()
+        message = [customer.serialize() for customer in results]
+        return_code = HTTP_200_OK
+    return jsonify(message), return_code
+
+
 ######################################################################
 # LIST ALL PETS
 ######################################################################
@@ -200,22 +226,7 @@ def disable_pets(id):
 
     return jsonify(message), return_code
 
-######################################################################
-# QUERY A CUSTOMER
-######################################################################
 
-
-@app.route('/customers/', methods=['GET'])
-def query_customer(id):
-    app.logger.info('Query a Customer with query')
-    if request.args:
-        costumer_list = [Customer.find_by_query(key, val) for key, val in request.args.items()]
-        message = set([costumer for costumer_list_i in costumer_list for costumer in costumer_list_i])
-        return_code = HTTP_200_OK
-    else:
-        message = {'error': 'No quesry'}
-        return_code = HTTP_404_NOT_FOUND
-    return jsonify(message), return_code
 ######################################################################
 # DELETE A PET
 ######################################################################
