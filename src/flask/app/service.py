@@ -35,6 +35,7 @@ from flask import Response, jsonify, request, json, url_for, make_response
 from flask import render_template
 from . import app
 from models import Customer, DataValidationError
+#from urlparse3 import urlparse3
 
 # Pull options from environment
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
@@ -59,27 +60,33 @@ connection = db_connect()
 ######################################################################
 # Error Handlers
 ######################################################################
+
+
 @app.errorhandler(DataValidationError)
 def request_validation_error(error):
     """ Handles all data validation issues from the model """
     return bad_request(error)
+
 
 @app.errorhandler(400)
 def bad_request(error):
     """ Handles requests that have bad or malformed data """
     return jsonify(status=400, error='Bad Request', message=error.message), 400
 
+
 @app.errorhandler(404)
 def not_found(error):
     """ Handles Pets that cannot be found """
     return jsonify(status=404, error='Not Found', message=error.message), 404
 
+
 @app.errorhandler(405)
 def method_not_supported(error):
     """ Handles bad method calls """
     return jsonify(status=405, error='Method not Allowed',
-                   message='Your request method is not supported.' \
+                   message='Your request method is not supported.'
                    ' Check your HTTP method and try again.'), 405
+
 
 @app.errorhandler(500)
 def internal_server_error(error):
@@ -92,9 +99,9 @@ def internal_server_error(error):
 @app.route('/')
 def index():
     """ Return something useful by default """
-    return jsonify(name='Customers Demo REST API Service',
+    return jsonify(name='Customer Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True)), HTTP_200_OK
+                   url=url_for('list_customer', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 
@@ -112,11 +119,11 @@ def create_customers():
     customer.save()
     message = customer.serialize()
     response = make_response(jsonify(message), HTTP_201_CREATED)
-    response.headers['Location'] = url_for('get_customers', id=customer.id, _external=True)
+    response.headers['Location'] = url_for('get_customer', id=customer.id, _external=True)
     return response
 
 ######################################################################
-# LIST ALL PETS
+# LIST ALL CUSTOMER
 ######################################################################
 @app.route('/customers', methods=['GET'])
 def list_customer():
@@ -130,16 +137,16 @@ def list_customer():
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route('/pets/<int:id>', methods=['GET'])
-def get_customers(id):
-    """ Retrieves a Pet with a specific id """
+@app.route('/customers/<int:id>', methods=['GET'])
+def get_customer(id):
+    """ Retrieves a Customer with a specific id """
     app.logger.info('Finding a Pet with id [{}]'.format(id))
-    pet = Pet.find(id)
-    if pet:
-        message = pet.serialize()
+    customer = Customer.find(id)
+    if customer:
+        message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Pet with id: %s was not found' % str(id)}
+        message = {'error' : 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
@@ -147,8 +154,9 @@ def get_customers(id):
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
+
 @app.route('/customers/<int:id>', methods=['PUT'])
-def update_pets(id):
+def update_customers(id):
     """ Updates a Pet in the database fom the posted database """
     app.logger.info('Updating a Customer with id [{}]'.format(id))
     customer = Customer.find(id)
@@ -160,21 +168,42 @@ def update_pets(id):
         message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Customer with id: %s was not found' % str(id)}
+        message = {'error': 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
 
 ######################################################################
-# DELETE A PET
+# DISABLE AN CUSTOMER
 ######################################################################
-@app.route('/pets/<int:id>', methods=['DELETE'])
-def delete_pets(id):
+
+
+@app.route('/customers/<int:id>/disable', methods=['PUT'])
+def disable_pets(id):
+    app.logger.info('Disabling a Customer with id [{}]'.format(id))
+    customer = Customer.find(id)
+    """ Diable a Customer in the database fom the posted database """
+    if customer:
+        customer.active = "False"
+        customer.save()
+        message = customer.serialize()
+        return_code = HTTP_200_OK
+    else:
+        message = {'error': 'Customer with id: %s was not found' % str(id)}
+        return_code = HTTP_404_NOT_FOUND
+
+    return jsonify(message), return_code
+
+######################################################################
+# DELETE A EXISTING CUSTOMER
+######################################################################
+@app.route('/customers/<int:id>', methods=['DELETE'])
+def delete_customer(id):
     """ Removes a Pet from the database that matches the id """
     app.logger.info('Deleting a Pet with id [{}]'.format(id))
-    pet = Pet.find(id)
-    if pet:
-        pet.delete()
+    customer = Customer.find(id)
+    if customer:
+        customer.delete()
     return make_response('', HTTP_204_NO_CONTENT)
 
 
@@ -187,11 +216,13 @@ def create_demo_data():
     app.logger.info('Loading demo Pets')
     Pet(0, 'fido', 'dog').save()
     Pet(0, 'kitty', 'cat').save()
-    return make_response(jsonify(message='Created demo pets'), HTTP_201_CREATED)
+    return make_response(jsonify(message='Created demo customers'), HTTP_201_CREATED)
 
 ######################################################################
 #   U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:

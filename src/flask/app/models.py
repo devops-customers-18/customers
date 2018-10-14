@@ -50,6 +50,7 @@ class Customer(object):
         self.password = password
         self.phone_number = phone_number
         self.active = active
+        self.customer_dict = {"id":id, "first_name":first_name, "last_name":last_name,"address":address, "email":email, "username":username, "passward":password, "phone_number":phone_number, "active":active}
 
     def save(self):
         """
@@ -130,13 +131,13 @@ class Customer(object):
         return None
 
     @classmethod
-    def find_by_category(cls, category):
+    def find_by_feature(cls, feature , assignment):
         """ Returns all of the Pets in a category
 
         Args:
             category (string): the category of the Pets you want to match
         """
-        return [pet for pet in cls.data if pet.category == category]
+        return [customer for customer in cls.data if customer.customer_dict[feature] == assignment]
 
     @classmethod
     def find_by_name(cls, name):
@@ -146,3 +147,5 @@ class Customer(object):
             name (string): the name of the Pets you want to match
         """
         return [pet for pet in cls.data if pet.name == name]
+
+    
