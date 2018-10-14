@@ -60,27 +60,33 @@ connection = db_connect()
 ######################################################################
 # Error Handlers
 ######################################################################
+
+
 @app.errorhandler(DataValidationError)
 def request_validation_error(error):
     """ Handles all data validation issues from the model """
     return bad_request(error)
+
 
 @app.errorhandler(400)
 def bad_request(error):
     """ Handles requests that have bad or malformed data """
     return jsonify(status=400, error='Bad Request', message=error.message), 400
 
+
 @app.errorhandler(404)
 def not_found(error):
     """ Handles Pets that cannot be found """
     return jsonify(status=404, error='Not Found', message=error.message), 404
 
+
 @app.errorhandler(405)
 def method_not_supported(error):
     """ Handles bad method calls """
     return jsonify(status=405, error='Method not Allowed',
-                   message='Your request method is not supported.' \
+                   message='Your request method is not supported.'
                    ' Check your HTTP method and try again.'), 405
+
 
 @app.errorhandler(500)
 def internal_server_error(error):
@@ -178,7 +184,7 @@ def get_customer(id):
 #                           %s, %s, %s, %s, %s);'
 #         cursor.execute(query, (req['First_Name'],
 #                                req['Last_Name'], req['Username'],
-#                                req['Password'], email, address, 
+#                                req['Password'], email, address,
 #                                phone_num, title, 'TRUE'))
 #         connection.commit()
 #         cursor.close()
@@ -193,6 +199,8 @@ def get_customer(id):
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
+
+
 @app.route('/customers/<int:id>', methods=['PUT'])
 def update_customers(id):
     """ Updates a Pet in the database fom the posted database """
@@ -206,7 +214,28 @@ def update_customers(id):
         message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Customer with id: %s was not found' % str(id)}
+        message = {'error': 'Customer with id: %s was not found' % str(id)}
+        return_code = HTTP_404_NOT_FOUND
+
+    return jsonify(message), return_code
+
+######################################################################
+# DISABLE AN CUSTOMER
+######################################################################
+
+
+@app.route('/customers/<int:id>/disable', methods=['PUT'])
+def disable_pets(id):
+    app.logger.info('Disabling a Customer with id [{}]'.format(id))
+    customer = Customer.find(id)
+    """ Diable a Customer in the database fom the posted database """
+    if customer:
+        customer.active = "False"
+        customer.save()
+        message = customer.serialize()
+        return_code = HTTP_200_OK
+    else:
+        message = {'error': 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
@@ -238,6 +267,8 @@ def create_demo_data():
 ######################################################################
 #   U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
