@@ -14,9 +14,6 @@ Vagrant.configure(2) do |config|
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
 
-  # Forward PostgreSQL port
-  config.vm.network "forwarded_port", guest: 5432, host: 5432, host_ip: "127.0.0.1"
-
   config.vm.network "private_network", ip: "192.168.33.10"
 
   config.vm.provider "virtualbox" do |vb|
@@ -39,8 +36,8 @@ Vagrant.configure(2) do |config|
   end
 
   # Copy your ~/.vimrc file so that vi looks the same
-  if Dir.exists?(File.expand_path("~/.vimrc"))
-    config.vm.provision "file", source: "~/.vimrc", destination: "~/.vimrc"
+  if Dir.exists?(File.expand_path("~/.vim"))
+    config.vm.provision "file", source: "~/.vim", destination: "~/.vim"
   end
 
   # Windows users need to change the permission of files and directories
@@ -56,36 +53,18 @@ Vagrant.configure(2) do |config|
     apt-get install -y git python-pip python-dev build-essential
     apt-get install pylint
     apt-get -y autoremove
-
-    #pip install --upgrade pip
     # Install app dependencies
     cd /vagrant
     pip install -r /src/requirements.txt
     cp pylintplugins.py /usr/lib/python2.7
   SHELL
 
-  #build shared directory with vagrant
-  #must behind installation of python; otherwise python will become python3
-  # config.vm.provision "docker" do |d|
-  #   d.build_image "/share_folder/flask",
-  #   #   args: "-t flask-image:latest"
-  #   # d.run "flask-image",
-  #   #   args: "--restart=always -d -h flask_image -p 5000:5000/tcp"
-  #   # d.build_image "/src/psql",
-  #   #   args: "-t psql-image:latest"
-  #   d.run "psql-image",
-  #     args: "--restart=always -d --name my_psql -h postgres -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data"
-  #   #d.pull_images "postgres"
-  # end
+  config.vm.provision "docker" do |d|
+    d.pull_images "postgres"
+    d.run "postgres", args: "--restart=always -d --name db -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data"
+  end
 
-  # Install
-  # Run init script
-  # Listening on the port (default 5432)
-  config.vm.provision "shell", inline: <<-INITDB
-    apt-get install -y postgresql
-    sudo -u postgres psql -f /src/psql/initdb.sql
-    sudo service postgresql start
-  INITDB
-
-
+  config.vm.provision "shell", inline: <<-SHELL
+    psql -U postgres -h 127.0.0.1 -p 5432 -f /src/psql/initdb.sql
+  SHELL
 end
