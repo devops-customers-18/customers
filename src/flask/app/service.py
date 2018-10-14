@@ -226,7 +226,7 @@ def create_demo_data():
     app.logger.info('Loading demo Pets')
     Pet(0, 'fido', 'dog').save()
     Pet(0, 'kitty', 'cat').save()
-    return make_response(jsonify(message='Created demo pets'), HTTP_201_CREATED)
+    return make_response(jsonify(message='Created demo customers'), HTTP_201_CREATED)
 
 ######################################################################
 #   U T I L I T Y   F U N C T I O N S
