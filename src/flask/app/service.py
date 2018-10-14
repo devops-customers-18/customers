@@ -86,19 +86,15 @@ def internal_server_error(error):
     """ Handles catostrophic errors """
     return jsonify(status=500, error='Internal Server Error', message=error.message), 500
 
-
 ######################################################################
 # GET INDEX
 ######################################################################
 @app.route('/')
 def index():
     """ Return something useful by default """
-    data = jsonify(name='Pet Demo REST API Service',
+    return jsonify(name='Customers Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_pets', _external=True))
-    customers = { 'user1': 'Sam' }
-    return render_template('index.html', data=data, customers=customers)
-
+                   url=url_for('list_pets', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 
@@ -116,11 +112,8 @@ def create_pets():
     customer.save()
     message = customer.serialize()
     response = make_response(jsonify(message), HTTP_201_CREATED)
-    # response.headers['Location'] = url_for('get_pets', id=pet.id, _external=True)
+    response.headers['Location'] = url_for('get_customers', id=pet.id, _external=True)
     return response
-
-
-
 
 ######################################################################
 # LIST ALL PETS
