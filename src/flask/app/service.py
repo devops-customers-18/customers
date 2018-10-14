@@ -119,7 +119,7 @@ def create_customers():
 # LIST ALL PETS
 ######################################################################
 @app.route('/customers', methods=['GET'])
-def list_pets():
+def list_customer():
     """ Retrieves a list of customers from the database """
     app.logger.info('Listing customers')
     results = []
