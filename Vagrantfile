@@ -54,7 +54,9 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git python-pip python-dev build-essential
+    apt-get install pylint
     apt-get -y autoremove
+
     #pip install --upgrade pip
     # Install app dependencies
     cd /vagrant
@@ -65,16 +67,16 @@ Vagrant.configure(2) do |config|
   #must behind installation of python; otherwise python will become python3
   # config.vm.provision "docker" do |d|
   #   d.build_image "/share_folder/flask",
-  #   #   args: "-t flask-image:latest" 
+  #   #   args: "-t flask-image:latest"
   #   # d.run "flask-image",
-  #   #   args: "--restart=always -d -h flask_image -p 5000:5000/tcp" 
+  #   #   args: "--restart=always -d -h flask_image -p 5000:5000/tcp"
   #   # d.build_image "/src/psql",
-  #   #   args: "-t psql-image:latest" 
-  #   d.run "psql-image", 
-  #     args: "--restart=always -d --name my_psql -h postgres -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data" 
+  #   #   args: "-t psql-image:latest"
+  #   d.run "psql-image",
+  #     args: "--restart=always -d --name my_psql -h postgres -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data"
   #   #d.pull_images "postgres"
-  # end 
-  
+  # end
+
   # Install
   # Run init script
   # Listening on the port (default 5432)
@@ -83,6 +85,6 @@ Vagrant.configure(2) do |config|
     sudo -u postgres psql -f /src/psql/initdb.sql
     sudo service postgresql start
   INITDB
- 
+
 
 end
