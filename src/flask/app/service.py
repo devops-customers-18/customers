@@ -241,6 +241,22 @@ def disable_pets(id):
     return jsonify(message), return_code
 
 ######################################################################
+# QUERY A CUSTOMER
+######################################################################
+
+
+@app.route('/customers/', methods=['GET'])
+def query_customer(id):
+    app.logger.info('Query a Customer with query')
+    if request.args:
+        costumer_list = [Customer.find_by_query(key, val) for key, val in request.args.items()]
+        message = set([costumer for costumer_list_i in costumer_list for costumer in costumer_list_i])
+        return_code = HTTP_200_OK
+    else:
+        message = {'error': 'No quesry'}
+        return_code = HTTP_404_NOT_FOUND
+    return jsonify(message), return_code
+######################################################################
 # DELETE A PET
 ######################################################################
 

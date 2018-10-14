@@ -23,9 +23,11 @@ Pet - A Pet used in the Pet Store
 """
 import threading
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
+
 
 class Customer(object):
     """
@@ -63,7 +65,6 @@ class Customer(object):
                 if Customer.data[i].id == self.id:
                     Customer.data[i] = self
                     break
-        
 
     def delete(self):
         """ Removes a Pet from the data store """
@@ -137,6 +138,17 @@ class Customer(object):
             category (string): the category of the Pets you want to match
         """
         return [pet for pet in cls.data if pet.category == category]
+
+    @classmethod
+    def find_by_query(cls, key, value):
+        """ Returns the list of the Customers in a data list which
+        satisfied the query
+
+        Args:
+            key (string): the attributes name
+            value: attributes values
+        """
+        return [customer for customer in cls.data if customer.__dict__.get(key) == value]
 
     @classmethod
     def find_by_name(cls, name):
