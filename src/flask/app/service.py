@@ -103,9 +103,8 @@ def index():
     """ Return something useful by default """
     return jsonify(name='Customer Demo REST API Service',
                    version='1.0',
-                   url=url_for('list_customer', _external=True)), HTTP_200_OK
+                   url=url_for('query_customer', _external=True)), HTTP_200_OK
 # Customers starts here.
-
 
 ######################################################################
 # ADD A NEW CUSTOMER
@@ -128,7 +127,6 @@ def create_customers():
 # QUERY A CUSTOMER
 ######################################################################
 
-
 @app.route('/customers', methods=['GET'])
 def query_customer():
     """query and get the intersection of the queries.
@@ -145,33 +143,32 @@ def query_customer():
     app.logger.info('Queries are: {}'.format(request.args.items().__str__()))
 
     if request.args:
+        # Query customers.
         costumer_lists = [Customer.find_by_query(key, val) for key, val in request.args.items()]
         costumer_set_list = [set(costumer_list) for costumer_list in costumer_lists]
         costumer_set = set.intersection(*costumer_set_list)
         message = [costumer.serialize() for costumer in costumer_set]
         return_code = HTTP_200_OK
-
     else:
+        # List all customers.
         results = Customer.all()
         message = [customer.serialize() for customer in results]
         return_code = HTTP_200_OK
-
     return jsonify(message), return_code
-
 
 ######################################################################
 # LIST ALL CUSTOMER
 ######################################################################
 
 
-@app.route('/customers', methods=['GET'])
-def list_customer():
-    """ Retrieves a list of customers from the database """
-    app.logger.info('Listing customers')
-    results = []
-    results = Customer.all()
+# @app.route('/customers', methods=['GET'])
+# def list_customer():
+#     """ Retrieves a list of customers from the database """
+#     app.logger.info('Listing customers')
+#     results = []
+#     results = Customer.all()
 
-    return jsonify([customer.serialize() for customer in results]), HTTP_200_OK
+#     return jsonify([customer.serialize() for customer in results]), HTTP_200_OK
 
 ######################################################################
 # RETRIEVE A PET
@@ -187,7 +184,6 @@ def get_customer(id):
     else:
         message = {'error' : 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
-
     return jsonify(message), return_code
 
 ######################################################################
@@ -209,16 +205,14 @@ def update_customers(id):
     else:
         message = {'error': 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
-
     return jsonify(message), return_code
 
 ######################################################################
 # DISABLE AN CUSTOMER
 ######################################################################
 
-
 @app.route('/customers/<int:id>/disable', methods=['PUT'])
-def disable_pets(id):
+def disable_customer(id):
     app.logger.info('Disabling a Customer with id [{}]'.format(id))
     customer = Customer.find(id)
     """ Diable a Customer in the database fom the posted database """
@@ -230,9 +224,7 @@ def disable_pets(id):
     else:
         message = {'error': 'Customer with id: %s was not found' % str(id)}
         return_code = HTTP_404_NOT_FOUND
-
     return jsonify(message), return_code
-
 
 ######################################################################
 # DELETE A EXISTING CUSTOMER
@@ -245,18 +237,6 @@ def delete_customer(id):
     if customer:
         customer.delete()
     return make_response('', HTTP_204_NO_CONTENT)
-
-
-######################################################################
-# Demo DATA
-######################################################################
-@app.route('/pets/demo', methods=['POST'])
-def create_demo_data():
-    """ Loads a few Pets into the database for demos """
-    app.logger.info('Loading demo Pets')
-    Pet(0, 'fido', 'dog').save()
-    Pet(0, 'kitty', 'cat').save()
-    return make_response(jsonify(message='Created demo customers'), HTTP_201_CREATED)
 
 ######################################################################
 #   U T I L I T Y   F U N C T I O N S
