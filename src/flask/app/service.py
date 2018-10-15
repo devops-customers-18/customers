@@ -163,7 +163,7 @@ def get_customer():
 # RETRIEVE A Cusotmer
 ######################################################################
 @app.route('/customers/<int:cust_id>', methods=['GET'])
-def find_customer(cust_id):
+def get_customer(cust_id):
     """ Retrieves a Customer with a specific id """
     app.logger.info('Finding a Customer with id [{}]'.format(cust_id))
     customer = Customer.find(cust_id)
