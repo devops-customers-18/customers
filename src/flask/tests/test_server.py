@@ -75,11 +75,14 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(data['username'], 'Ker')
+        self.assertEqual(data['first_name'], 'afido')
+        self.assertEqual(data['last_name'], 'cat')
 
     def test_get_customer_not_found(self):
         """ Get a Pet thats not found """
         resp = self.app.get('/customers/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
 
     def test_create_customer(self):
         """ Create a customers """
@@ -108,14 +111,14 @@ class TestPetServer(unittest.TestCase):
         self.assertIn(new_json, data)
 
     def test_spoof_customer_id(self):
-        """ Create a Pet passing in an id """
+        """ Create a customer passing in an id """
         # add a new pet
         new_customer = {"username": "foo111", "password": "bar",
                         "first_name":"value1", "last_name":"value2", "id": 999,
                         "address": "Jersey", "phone_number": "773",
                         "active": True, "email": "3333"}
         data = json.dumps(new_customer)
-        resp = self.app.post('/pets', data=data, content_type='application/json')
+        resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -138,19 +141,28 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
+    
+    def test_disable_customer(self):
+        """ Disable a customer """
+        resp = self.app.put('/customers/1/disable', content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.app.get('/customers/1', content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['active'], 'False')
 
     def test_update_customer_with_no_name(self):
-        """ Update a Customer with no username """
+        """ Update a customer with no username """
         new_customer = {"password": "bar", "first_name":"value1",
-                        "last_name":"value2", "id": 0,
-                        "address": "Jersey", "phone_number": "773",
-                        "active": True, "email": "3333"}
+                        "last_name":"value2", "address": "Jersey",
+                        "phone_number": "773", "active": True,
+                        "email": "3333"}
         data = json.dumps(new_customer)
         resp = self.app.put('/customers/2', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_customer_not_found(self):
-        """ Update a Pet that can't be found """
+        """ Update a Customer that can't be found """
         new_man = {"username": "noguy", "password": "bar",
                    "first_name":"value1", "last_name":"value2", "id": 0,
                    "address": "Jersey", "phone_number": "773",
@@ -160,7 +172,7 @@ class TestPetServer(unittest.TestCase):
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_customer(self):
-        """ Delete a Pet that exists """
+        """ Delete a customer that exists """
         # save the current number of pets for later comparrison
         customer_count = self.get_customers_count()
         # delete a pet
@@ -171,7 +183,7 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(new_count, customer_count - 1)
 
     def test_create_customer_with_no_name(self):
-        """ Create a Pet with the name missing """
+        """ Create a customer with the name missing """
         new_customer = {"password": "bar",
                         "first_name":"value1", "last_name":"value2", "id": 0,
                         "address": "Jersey", "phone_number": "773",
@@ -181,20 +193,20 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_nonexisting_customer(self):
-        """ Get a Pet that doesn't exist """
+        """ Get a customer that doesn't exist """
         resp = self.app.get('/customers/5')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_query_customer_list_by_category(self):
-        """ Query Pets by Category """
-        resp = self.app.get('/customers', query_string='category=dog')
+        """ Query Customers by Category """
+        resp = self.app.get('/customers', query_string='username=kerker')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
         self.assertTrue('fido' in resp.data)
-        self.assertFalse('kitty' in resp.data)
+        self.assertFalse('afido' in resp.data)
         data = json.loads(resp.data)
         query_item = data[0]
-        self.assertEqual(query_item['category'], 'dog')
+        self.assertEqual(query_item['username'], 'kerker')
 
     def test_method_not_allowed(self):
         """ Call a Method thats not Allowed """
@@ -207,7 +219,7 @@ class TestPetServer(unittest.TestCase):
 ######################################################################
 
     def get_customers_count(self):
-        """ save the current number of pets """
+        """ save the current number of customers """
         resp = self.app.get('/customers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
