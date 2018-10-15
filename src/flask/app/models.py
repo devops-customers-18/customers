@@ -89,7 +89,6 @@ class Customer(object):
         if not isinstance(data, dict):
             raise DataValidationError('Invalid customer: body of request contained bad or no data')
         try:
-            self.id = data["id"]
             self.first_name = data["first_name"]
             self.last_name = data["last_name"]
             self.address = data["address"]
