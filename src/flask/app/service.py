@@ -96,6 +96,8 @@ def internal_server_error(error):
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route('/')
 def index():
     """ Return something useful by default """
@@ -123,8 +125,45 @@ def create_customers():
     return response
 
 ######################################################################
+# QUERY A CUSTOMER
+######################################################################
+
+
+@app.route('/customers', methods=['GET'])
+def query_customer():
+    """query and get the intersection of the queries.
+    if there is no given query return all the list
+    Args:
+        **par: parameter of query
+        empty equry
+
+    return:
+        1. the intersection of the parameters
+        2. empty equry will return all the data
+    """
+    app.logger.info('Query a Customer with query')
+    app.logger.info('Queries are: {}'.format(request.args.items().__str__()))
+
+    if request.args:
+        costumer_lists = [Customer.find_by_query(key, val) for key, val in request.args.items()]
+        costumer_set_list = [set(costumer_list) for costumer_list in costumer_lists]
+        costumer_set = set.intersection(*costumer_set_list)
+        message = [costumer.serialize() for costumer in costumer_set]
+        return_code = HTTP_200_OK
+
+    else:
+        results = Customer.all()
+        message = [customer.serialize() for customer in results]
+        return_code = HTTP_200_OK
+
+    return jsonify(message), return_code
+
+
+######################################################################
 # LIST ALL CUSTOMER
 ######################################################################
+
+
 @app.route('/customers', methods=['GET'])
 def list_customer():
     """ Retrieves a list of customers from the database """
@@ -193,6 +232,7 @@ def disable_pets(id):
         return_code = HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
+
 
 ######################################################################
 # DELETE A EXISTING CUSTOMER
