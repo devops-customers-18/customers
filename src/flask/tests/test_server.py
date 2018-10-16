@@ -46,9 +46,6 @@ class TestPetServer(unittest.TestCase):
                         'kerker', 'aa', '932').save()
         service.Customer(0, 'afido', 'cat', 'ny', 'c@b.com',
                         'Ker', 'ww', '9321').save()
-        # first_name='', last_name='',
-        # address='', email='', username='', password='',
-        # phone_number='', active=True
         self.app = service.app.test_client()
 
     def tearDown(self):
@@ -62,15 +59,8 @@ class TestPetServer(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertEqual(data['name'], 'Customer Demo REST API Service')
 
-    def test_get_customer_list(self):
-        """ Get a list of Customer """
-        resp = self.app.get('/customers')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
-        self.assertEqual(len(data), 2)
-
-    def test_get_customer(self):
-        """ Get one customer """
+    def test_find_customer(self):
+        """ Find one customer """
         resp = self.app.get('/customers/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
@@ -82,7 +72,6 @@ class TestPetServer(unittest.TestCase):
         """ Get a Pet thats not found """
         resp = self.app.get('/customers/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
 
     def test_create_customer(self):
         """ Create a customers """
@@ -196,6 +185,13 @@ class TestPetServer(unittest.TestCase):
         """ Get a customer that doesn't exist """
         resp = self.app.get('/customers/5')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_customer_list_without_queries(self):
+        """ Get a list of Customer """
+        resp = self.app.get('/customers')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(len(data), 2)
 
     def test_get_customer_list_with_queries(self):
         """ Get Customers with queries """
