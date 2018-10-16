@@ -82,7 +82,7 @@ class TestPetServer(unittest.TestCase):
         """ Get a Pet thats not found """
         resp = self.app.get('/customers/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
 
     def test_create_customer(self):
         """ Create a customers """
@@ -141,7 +141,7 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
-    
+
     def test_disable_customer(self):
         """ Disable a customer """
         resp = self.app.put('/customers/1/disable', content_type='application/json')
@@ -197,8 +197,8 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/customers/5')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_query_customer_list_by_category(self):
-        """ Query Customers by Category """
+    def test_get_customer_list_with_queries(self):
+        """ Get Customers with queries """
         resp = self.app.get('/customers', query_string='username=kerker')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)

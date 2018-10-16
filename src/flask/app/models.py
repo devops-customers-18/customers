@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Models for Pet Demo Service
+Models for Customer
 
 All of the models are stored in this module
 
 Models
 ------
-Pet - A Pet used in the Pet Store
+Customer - A Customer used in the Customer Store
 
 """
 import threading
@@ -56,7 +56,7 @@ class Customer(object):
 
     def save(self):
         """
-        Saves a Pet to the data store
+        Saves a Customer to the data store
         """
         if self.id == 0:
             self.id = self.__next_index()
@@ -68,11 +68,11 @@ class Customer(object):
                     break
 
     def delete(self):
-        """ Removes a Pet from the data store """
+        """ Removes a Customer from the data store """
         Customer.data.remove(self)
 
     def serialize(self):
-        """ Serializes a Pet into a dictionary """
+        """ Serializes a Customer into a dictionary """
         return {"id": self.id, "first_name": self.first_name,
                 "last_name": self.last_name, "address": self.address,
                 "email": self.email, "username": self.username,
@@ -81,10 +81,10 @@ class Customer(object):
 
     def deserialize(self, data):
         """
-        Deserializes a Pet from a dictionary
+        Deserializes a Customer from a dictionary
 
         Args:
-            data (dict): A dictionary containing the Pet data
+            data (dict): A dictionary containing the Customer data
         """
         if not isinstance(data, dict):
             raise DataValidationError('Invalid customer: body of request contained bad or no data')
@@ -115,7 +115,7 @@ class Customer(object):
 
     @classmethod
     def remove_all(cls):
-        """ Removes all of the Pets from the database """
+        """ Removes all of the Customers from the database """
         del cls.data[:]
         cls.index = 0
         return cls.data
@@ -131,15 +131,6 @@ class Customer(object):
         return None
 
     @classmethod
-    def find_by_feature(cls, feature , assignment):
-        """ Returns all of the Pets in a category
-
-        Args:
-            category (string): the category of the Pets you want to match
-        """
-        return [customer for customer in cls.data if customer.customer_dict[feature] == assignment]
-
-    @classmethod
     def find_by_query(cls, key, value):
         """ Returns the list of the Customers in a data list which
         satisfied the query
@@ -149,14 +140,3 @@ class Customer(object):
             value: attributes values
         """
         return [customer for customer in cls.data if customer.__dict__.get(key) == value]
-
-    @classmethod
-    def find_by_name(cls, name):
-        """ Returns all Pets with the given name
-
-        Args:
-            name (string): the name of the Pets you want to match
-        """
-        return [pet for pet in cls.data if pet.name == name]
-
-    
