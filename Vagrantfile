@@ -36,9 +36,9 @@ Vagrant.configure(2) do |config|
   end
 
   # Copy your ~/.vimrc file so that vi looks the same
-  if Dir.exists?(File.expand_path("~/.vim"))
-    config.vm.provision "file", source: "~/.vim", destination: "~/.vim"
-  end
+  # if File.directory?(File.expand_path("~/.vim"))
+  #   config.vm.provision "file", source: "~/.vim", destination: "~/.vim"
+  # end
 
   # Windows users need to change the permission of files and directories
   # so that nosetests runs without extra arguments.
@@ -63,7 +63,9 @@ Vagrant.configure(2) do |config|
     d.run "postgres", args: "--restart=always -d --name db -p 127.0.0.1:5432:5432 -v /var/lib/psql/data:/var/lib/postgresql/data"
   end
 
-  config.vm.provision "shell", inline: <<-SHELL
-    psql -U postgres -h 127.0.0.1 -p 5432 -f /src/psql/initdb.sql
-  SHELL
+  # config.trigger.after :provision do |trigger|
+  #   trigger.run_remote = {
+  #     inline: "psql -U postgres -h 127.0.0.1 -p 5432 -f /src/psql/initdb.sql"
+  #   }
+  # end
 end
