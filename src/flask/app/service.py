@@ -30,12 +30,12 @@ DELETE /customers{id} - Removes a Pet from the database that matches the id
 import os
 import sys
 import logging
-from database import db_connect
-from flask import Response, jsonify, request, json, url_for, make_response
-from flask import render_template
+
+from flask import jsonify, request, url_for, make_response
+from app.database import db_connect
+from app.models import Customer, DataValidationError
 from . import app
-from models import Customer, DataValidationError
-#from urlparse3 import urlparse3
+# from urlparse3 import urlparse3
 
 # Pull options from environment
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
@@ -50,7 +50,7 @@ HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
 # Postgres connection.
-connection = db_connect()
+CONNECTION = db_connect()
 
 # cursor.execute(query)
 # one = cursor.fetch_one()
@@ -103,12 +103,14 @@ def index():
     """ Return something useful by default """
     return jsonify(name='Customer Demo REST API Service',
                    version='1.0',
-                   url=url_for('query_customer', _external=True)), HTTP_200_OK
+                   url=url_for('get_customer', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 ######################################################################
 # ADD A NEW CUSTOMER
 ######################################################################
+
+
 @app.route('/customers', methods=['POST'])
 def create_customers():
     """Create a customer in the database."""
@@ -120,15 +122,16 @@ def create_customers():
     customer.save()
     message = customer.serialize()
     response = make_response(jsonify(message), HTTP_201_CREATED)
-    response.headers['Location'] = url_for('get_customer', id=customer.id, _external=True)
+    response.headers['Location'] = url_for('get_customer', cust_id=customer.id, _external=True)
     return response
 
 ######################################################################
 # QUERY A CUSTOMER
 ######################################################################
 
+
 @app.route('/customers', methods=['GET'])
-def query_customer():
+def get_customer():
     """query and get the intersection of the queries.
     if there is no given query return all the list
     Args:
@@ -157,32 +160,18 @@ def query_customer():
     return jsonify(message), return_code
 
 ######################################################################
-# LIST ALL CUSTOMER
+# RETRIEVE A Cusotmer
 ######################################################################
-
-
-# @app.route('/customers', methods=['GET'])
-# def list_customer():
-#     """ Retrieves a list of customers from the database """
-#     app.logger.info('Listing customers')
-#     results = []
-#     results = Customer.all()
-
-#     return jsonify([customer.serialize() for customer in results]), HTTP_200_OK
-
-######################################################################
-# RETRIEVE A PET
-######################################################################
-@app.route('/customers/<int:id>', methods=['GET'])
-def get_customer(id):
+@app.route('/customers/<int:cust_id>', methods=['GET'])
+def find_customer(cust_id):
     """ Retrieves a Customer with a specific id """
-    app.logger.info('Finding a Pet with id [{}]'.format(id))
-    customer = Customer.find(id)
+    app.logger.info('Finding a Customer with id [{}]'.format(cust_id))
+    customer = Customer.find(cust_id)
     if customer:
         message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error' : 'Customer with id: %s was not found' % str(id)}
+        message = {'error': 'Customer with id: %s was not found' % str(cust_id)}
         return_code = HTTP_404_NOT_FOUND
     return jsonify(message), return_code
 
@@ -190,20 +179,21 @@ def get_customer(id):
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
 
-@app.route('/customers/<int:id>', methods=['PUT'])
-def update_customers(id):
-    """ Updates a Pet in the database fom the posted database """
-    app.logger.info('Updating a Customer with id [{}]'.format(id))
-    customer = Customer.find(id)
+
+@app.route('/customers/<int:cust_id>', methods=['PUT'])
+def update_customers(cust_id):
+    """ Updates a Customer in the database fom the posted database """
+    app.logger.info('Updating a Customer with id [{}]'.format(cust_id))
+    customer = Customer.find(cust_id)
     if customer:
         customer_info = request.get_json()
         customer.deserialize(customer_info)
-        customer.id = id
+        customer.id = cust_id
         customer.save()
         message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error': 'Customer with id: %s was not found' % str(id)}
+        message = {'error': 'Customer with id: %s was not found' % str(cust_id)}
         return_code = HTTP_404_NOT_FOUND
     return jsonify(message), return_code
 
@@ -211,29 +201,32 @@ def update_customers(id):
 # DISABLE AN CUSTOMER
 ######################################################################
 
-@app.route('/customers/<int:id>/disable', methods=['PUT'])
-def disable_customer(id):
-    app.logger.info('Disabling a Customer with id [{}]'.format(id))
-    customer = Customer.find(id)
-    """ Diable a Customer in the database fom the posted database """
+@app.route('/customers/<int:cust_id>/disable', methods=['PUT'])
+def disable_customer(cust_id):
+    """ Diable a Customer's active attributes in the database """
+    app.logger.info('Disabling a Customer with id [{}]'.format(cust_id))
+    customer = Customer.find(cust_id)
+
     if customer:
         customer.active = "False"
         customer.save()
         message = customer.serialize()
         return_code = HTTP_200_OK
     else:
-        message = {'error': 'Customer with id: %s was not found' % str(id)}
+        message = {'error': 'Customer with id: %s was not found' % str(cust_id)}
         return_code = HTTP_404_NOT_FOUND
     return jsonify(message), return_code
 
 ######################################################################
 # DELETE A EXISTING CUSTOMER
 ######################################################################
-@app.route('/customers/<int:id>', methods=['DELETE'])
-def delete_customer(id):
-    """ Removes a Pet from the database that matches the id """
-    app.logger.info('Deleting a Pet with id [{}]'.format(id))
-    customer = Customer.find(id)
+
+
+@app.route('/customers/<int:cust_id>', methods=['DELETE'])
+def delete_customer(cust_id):
+    """ Removes a Customer from the database that matches the id """
+    app.logger.info('Deleting a Customer with id [{}]'.format(cust_id))
+    customer = Customer.find(cust_id)
     if customer:
         customer.delete()
     return make_response('', HTTP_204_NO_CONTENT)
