@@ -39,11 +39,11 @@ class Customer(object):
     data = []
     index = 0
 
-    def __init__(self, id=0, first_name='', last_name='',
+    def __init__(self, cust_id=0, first_name='', last_name='',
                  address='', email='', username='', password='',
                  phone_number='', active=True):
         """ Initialize a Customer. """
-        self.id = id
+        self.id = cust_id
         self.first_name = first_name
         self.last_name = last_name
         self.address = address
@@ -52,7 +52,13 @@ class Customer(object):
         self.password = password
         self.phone_number = phone_number
         self.active = active
-        self.customer_dict = {"id":id, "first_name":first_name, "last_name":last_name,"address":address, "email":email, "username":username, "passward":password, "phone_number":phone_number, "active":active}
+        self.customer_dict = {"id": cust_id, "first_name": first_name,
+                              "last_name": last_name, "address": address,
+                              "email": email,
+                              "username": username,
+                              "passward": password,
+                              "phone_number": phone_number,
+                              "active": active}
 
     def save(self):
         """

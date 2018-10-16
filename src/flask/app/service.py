@@ -103,7 +103,7 @@ def index():
     """ Return something useful by default """
     return jsonify(name='Customer Demo REST API Service',
                    version='1.0',
-                   url=url_for('get_customer', _external=True)), HTTP_200_OK
+                   url=url_for('get_customers', _external=True)), HTTP_200_OK
 # Customers starts here.
 
 ######################################################################
@@ -131,7 +131,7 @@ def create_customers():
 
 
 @app.route('/customers', methods=['GET'])
-def get_customer():
+def get_customers():
     """query and get the intersection of the queries.
     if there is no given query return all the list
     Args:
@@ -163,7 +163,7 @@ def get_customer():
 # RETRIEVE A Cusotmer
 ######################################################################
 @app.route('/customers/<int:cust_id>', methods=['GET'])
-def find_customer(cust_id):
+def get_customer(cust_id):
     """ Retrieves a Customer with a specific id """
     app.logger.info('Finding a Customer with id [{}]'.format(cust_id))
     customer = Customer.find(cust_id)
