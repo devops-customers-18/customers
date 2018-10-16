@@ -56,7 +56,6 @@ Vagrant.configure(2) do |config|
     # Install app dependencies
     cd /vagrant
     pip install -r /src/requirements.txt
-    cp pylintplugins.py /usr/lib/python2.7
   SHELL
 
   config.vm.provision "docker" do |d|
