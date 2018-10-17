@@ -55,7 +55,7 @@ Vagrant.configure(2) do |config|
     apt-get -y autoremove
     # Install app dependencies
     cd /vagrant
-    pip install -r /src/requirements.txt
+    pip install -r requirements.txt
   SHELL
 
   config.vm.provision "docker" do |d|
