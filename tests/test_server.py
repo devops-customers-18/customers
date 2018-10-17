@@ -64,12 +64,16 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/customers/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(data['username'], 'Ker')
         self.assertEqual(data['first_name'], 'afido')
         self.assertEqual(data['last_name'], 'cat')
+        self.assertEqual(data['address'], 'ny')
+        self.assertEqual(data['email'], 'c@b.com')
+        self.assertEqual(data['username'], 'Ker')
+        self.assertEqual(data['password'], 'ww')
+        self.assertEqual(data['phone_number'], '9321')
 
     def test_get_customer_not_found(self):
-        """ Get a Pet thats not found """
+        """ Get a Customer thats not found """
         resp = self.app.get('/customers/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -92,6 +96,12 @@ class TestPetServer(unittest.TestCase):
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
+        self.assertEqual(new_json['first_name'], 'value1')
+        self.assertEqual(new_json['last_name'], 'value2')
+        self.assertEqual(new_json['address'], 'Jersey')
+        self.assertEqual(new_json['email'], '3333')
+        self.assertEqual(new_json['password'], 'bar')
+        self.assertEqual(new_json['phone_number'], '773')
         # check that count has gone up and includes sammy
         resp = self.app.get('/customers')
         data = json.loads(resp.data)
@@ -115,6 +125,12 @@ class TestPetServer(unittest.TestCase):
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
+        self.assertEqual(new_json['first_name'], 'value1')
+        self.assertEqual(new_json['last_name'], 'value2')
+        self.assertEqual(new_json['address'], 'Jersey')
+        self.assertEqual(new_json['email'], '3333')
+        self.assertEqual(new_json['password'], 'bar')
+        self.assertEqual(new_json['phone_number'], '773')
         self.assertNotEqual(new_json['id'], 999)
 
     def test_update_customer(self):
@@ -130,6 +146,12 @@ class TestPetServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
+        self.assertEqual(new_json['first_name'], 'value1')
+        self.assertEqual(new_json['last_name'], 'value2')
+        self.assertEqual(new_json['address'], 'Jersey')
+        self.assertEqual(new_json['email'], '3333')
+        self.assertEqual(new_json['password'], 'bar')
+        self.assertEqual(new_json['phone_number'], '773')
 
     def test_disable_customer(self):
         """ Disable a customer """
@@ -203,6 +225,12 @@ class TestPetServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['username'], 'kerker')
+        self.assertEqual(query_item['first_name'], 'fido')
+        self.assertEqual(query_item['last_name'], 'dog')
+        self.assertEqual(query_item['address'], 'nj')
+        self.assertEqual(query_item['email'], 'a@b.com')
+        self.assertEqual(query_item['password'], 'aa')
+        self.assertEqual(query_item['phone_number'], '932')
 
     def test_method_not_allowed(self):
         """ Call a Method thats not Allowed """
