@@ -13,7 +13,7 @@ Clone the project to your development folder and create your Vagrant vm
 
 ```
     $ git clone https://github.com/devops-customers-18/customers.git
-    $ cd customers/vm
+    $ cd customers
     $ vagrant up
 ```
 
