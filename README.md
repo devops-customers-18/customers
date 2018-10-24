@@ -91,7 +91,7 @@ it will show the test result and coverage rate
 1. ```/customers?query1=value&query2=value```
     Use this URL to GET the customer resources which satisfied all the query conditions.
 2. Example: (the double quotes matter in this case)
-    ```curl -X GET http://0.0.0.0:5000/customers?active=True&username=foo111```
+    ```curl -X GET "http://0.0.0.0:5000/customers?active=True&username=foo111"```
 
 
 ### Perform some Action on the Resource - Disable the active
