@@ -131,7 +131,7 @@ def create_customers():
 
 
 @app.route('/customers', methods=['GET'])
-def get_customers():
+def query_customers():
     """query and get the intersection of the queries.
     if there is no given query return all the list
     Args:
@@ -162,6 +162,8 @@ def get_customers():
 ######################################################################
 # RETRIEVE A Cusotmer
 ######################################################################
+
+
 @app.route('/customers/<int:cust_id>', methods=['GET'])
 def get_customer(cust_id):
     """ Retrieves a Customer with a specific id """
@@ -200,6 +202,7 @@ def update_customers(cust_id):
 ######################################################################
 # DISABLE AN CUSTOMER
 ######################################################################
+
 
 @app.route('/customers/<int:cust_id>/disable', methods=['PUT'])
 def disable_customer(cust_id):

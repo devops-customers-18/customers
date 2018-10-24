@@ -26,13 +26,15 @@ from app.models import Customer, DataValidationError
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestCustomers(unittest.TestCase):
     """ Test Cases for Customers """
 
     def setUp(self):
         Customer.remove_all()
 
-    def test_create_a_customer(self):
+    def test_a_customer(self):
         """ Create a customer and assert that it exists """
         customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         self.assertTrue(customer != None)
@@ -107,11 +109,11 @@ class TestCustomers(unittest.TestCase):
 
     def test_deserialize_a_customer(self):
         """ Test deserialization of a Customer """
-        data = { "id": 1, "first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True }
+        data = {"id": 1, "first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True}
         customer = Customer()
         customer.deserialize(data)
         self.assertNotEqual(customer, None)
-        self.assertEqual(customer.id, 0) # id should be ignored
+        self.assertEqual(customer.id, 0)  # id should be ignored
         self.assertEqual(customer.first_name, "Arturo")
         self.assertEqual(customer.last_name, "Frank")
 
