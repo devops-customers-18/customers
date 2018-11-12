@@ -234,7 +234,27 @@ def delete_customer(cust_id):
 ######################################################################
 #   U T I L I T Y   F U N C T I O N S
 ######################################################################
+@app.before_first_request
+def init_db(redis=None):
+    """ Initlaize the model """
+    Pet.init_db(redis)
 
+# load sample data
+def data_load(payload):
+    """ Loads a Pet into the database """
+    pet = Pet(0, payload['name'], payload['category'])
+    pet.save()
+
+def data_reset():
+    """ Removes all Pets from the database """
+    Pet.remove_all()
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    if request.headers['Content-Type'] == content_type:
+        return
+    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+    abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
