@@ -13,51 +13,44 @@
 # limitations under the License.
 
 """
-Test cases for the Pet Service
+Test cases for the Customer Service
 
 Test cases can be run with:
   nosetests
   coverage report -m
 """
 
-import logging
 import unittest
+import logging
 import json
 from flask_api import status    # HTTP Status Codes
-from app.models import DataValidationError
-import app.service as service
+from service import app
+from service.models import Customer
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestPetServer(unittest.TestCase):
-    """ Pet Server Tests """
-
-    @classmethod
-    def setUpClass(cls):
-        """ Run once before all tests """
-        service.app.debug = False
-        service.initialize_logging(logging.ERROR)
+class TestCustomerServer(unittest.TestCase):
+    """ Customer Server Tests """
 
     def setUp(self):
         """ Runs before each test """
-        service.Customer.remove_all()
-        service.Customer(0, 'fido', 'dog', 'nj', 'a@b.com',
+        Customer.remove_all()
+        Customer(0, 'fido', 'dog', 'nj', 'a@b.com',
                         'kerker', 'aa', '932').save()
-        service.Customer(0, 'afido', 'cat', 'ny', 'c@b.com',
+        Customer(0, 'afido', 'cat', 'ny', 'c@b.com',
                         'Ker', 'ww', '9321').save()
-        self.app = service.app.test_client()
+        self.app = app.test_client()
 
     def tearDown(self):
         """ Runs after each test """
-        service.Customer.remove_all()
+        Customer.remove_all()
 
     def test_index(self):
         """ Test the Home Page """
         resp = self.app.get('/')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
-        self.assertEqual(data['name'], 'Customer Demo REST API Service')
+        self.assertIn('Flask Template Example', resp.data)
 
     def test_find_customer(self):
         """ Find one customer """
