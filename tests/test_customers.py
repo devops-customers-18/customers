@@ -21,7 +21,7 @@ Test cases can be run with:
 """
 
 import unittest
-from app.models import Customer, DataValidationError
+from service.models import Customer, DataValidationError
 
 ######################################################################
 #  T E S T   C A S E S
@@ -156,5 +156,3 @@ class TestCustomers(unittest.TestCase):
 ######################################################################
 if __name__ == '__main__':
     unittest.main()
-    # suite = unittest.TestLoader().loadTestsFromTestCase(TestPets)
-    # unittest.TextTestRunner(verbosity=2).run(suite)
