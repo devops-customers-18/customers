@@ -103,6 +103,16 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(len(data), customers_count + 1)
         self.assertIn(new_json, data)
 
+    def test_create_customer_no_content_type(self):
+        """ Create a Pet with no Content-Type """
+        new_customer = {"username": "foo111", "password": "bar",
+                        "first_name":"value1", "last_name":"value2", "id": 0,
+                        "address": "Jersey", "phone_number": "773",
+                        "active": True, "email": "3333"}
+        data = json.dumps(new_customer)
+        resp = self.app.post('/customers', data=data)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_spoof_customer_id(self):
         """ Create a customer passing in an id """
         # add a new pet

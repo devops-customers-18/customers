@@ -42,10 +42,12 @@ class CustomerCollection(Resource):
     def post(self):
         """Create a customer in the database"""
         app.logger.info('Creating a new customer')
+
         content_type = request.headers.get('Content-Type')
+        if not content_type or content_type != 'application/json':
+            abort(status.HTTP_400_BAD_REQUEST, "No Content-Type set")
 
         customer_info = request.get_json()
-
         customer = Customer()
         try:
             customer.deserialize(customer_info)
