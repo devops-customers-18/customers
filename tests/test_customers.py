@@ -21,6 +21,11 @@ Test cases can be run with:
 """
 
 import unittest
+import os
+import json
+from mock import patch
+from redis import Redis, ConnectionError
+from werkzeug.exceptions import NotFound
 from service.models import Customer, DataValidationError
 
 ######################################################################
@@ -32,6 +37,7 @@ class TestCustomers(unittest.TestCase):
     """ Test Cases for Customers """
 
     def setUp(self):
+        Customer.init_db()
         Customer.remove_all()
 
     def test_a_customer(self):
@@ -149,7 +155,6 @@ class TestCustomers(unittest.TestCase):
         customers = Customer.find_by_query("last_name", "Frank")
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].last_name, "Frank")
-
 
 ######################################################################
 #   M A I N
