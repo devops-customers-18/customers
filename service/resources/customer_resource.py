@@ -41,6 +41,11 @@ class CustomerResource(Resource):
         Update a single Customer
         """
         app.logger.info('Updating a Customer with id [{}]'.format(customer_id))
+
+        content_type = request.headers.get('Content-Type')
+        if not content_type or content_type != 'application/json':
+            abort(status.HTTP_400_BAD_REQUEST, "No Content-Type set")
+
         customer = Customer.find(customer_id)
         if not customer:
             abort(status.HTTP_404_NOT_FOUND, "Customer with id '{}' was not found.".format(customer_id))
