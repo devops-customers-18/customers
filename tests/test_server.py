@@ -50,7 +50,8 @@ class TestCustomerServer(unittest.TestCase):
         """ Test the Home Page """
         resp = self.app.get('/')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn('Flask Template Example', resp.data)
+        data = json.loads(resp.data)
+        self.assertEqual(data['name'], 'Customer Demo REST API Service')
 
     def test_find_customer(self):
         """ Find one customer """
