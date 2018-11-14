@@ -2,9 +2,7 @@
 Flask==1.0.2
 Flask-API==1.0
 flask-restful==0.3.6
-psycopg2-binary==2.7.5
-redis>=2.10
-Cerberus==1.1
+cloudant==2.9.0
 
 # Runtime
 gunicorn==19.9.0
