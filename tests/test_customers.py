@@ -20,31 +20,47 @@ Test cases can be run with:
   coverage report -m
 """
 
-import unittest
 import os
 import json
+import time # use for rate limiting Cloudant Lite :(
+import unittest
 from mock import patch
-from redis import Redis, ConnectionError
-from werkzeug.exceptions import NotFound
 from service.models import Customer, DataValidationError
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
 
+VCAP_SERVICES = {
+    'cloudantNoSQLDB': [
+        {'credentials': {
+            'username': 'admin',
+            'password': 'pass',
+            'host': '127.0.0.1',
+            'port': 5984,
+            'url': 'http://admin:pass@127.0.0.1:5984'
+            }
+        }
+    ]
+}
 
 class TestCustomers(unittest.TestCase):
     """ Test Cases for Customers """
 
     def setUp(self):
-        Customer.init_db()
+        """ Initialize the Cloudant database """
+        print("What the funct")
+        Customer.init_db('test')
         Customer.remove_all()
+    
+    def tearDown(self):
+        if 'VCAP_SERVICES' in os.environ:
+            time.sleep(0.5)
 
-    def test_a_customer(self):
+    def test_create_a_customer(self):
         """ Create a customer and assert that it exists """
-        customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         self.assertTrue(customer != None)
-        self.assertEqual(customer.id, 0)
         self.assertEqual(customer.first_name, "Arturo")
         self.assertEqual(customer.last_name, "Frank")
         self.assertEqual(customer.address, "USA")
@@ -58,33 +74,32 @@ class TestCustomers(unittest.TestCase):
         """ Create a customer and add it to the database """
         customers = Customer.all()
         self.assertEqual(customers, [])
-        customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         self.assertTrue(customer != None)
-        self.assertEqual(customer.id, 0)
+        self.assertEqual(customer.id, None)
         customer.save()
         # Asert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertNotEqual(customer.id, None)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
 
     def test_update_a_customer(self):
         """ Update a Customer"""
-        customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         customer.save()
-        self.assertEqual(customer.id, 1)
+        self.assertNotEqual(customer.id, None)
         # Change it an save it
-        customer.category = "k9"
+        customer.first_name = "k9"
         customer.save()
-        self.assertEqual(customer.id, 1)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
-        self.assertEqual(customers[0].category, "k9")
+        self.assertEqual(customers[0].first_name, "k9")
 
     def test_delete_a_customer(self):
         """ Delete a Customer"""
-        customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         customer.save()
         self.assertEqual(len(Customer.all()), 1)
         # delete the customer and make sure it isn't in the database
@@ -93,11 +108,10 @@ class TestCustomers(unittest.TestCase):
 
     def test_serialize_a_customer(self):
         """ Test serialization of a Customer """
-        customer = Customer(0, "Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
         data = customer.serialize()
         self.assertNotEqual(data, None)
-        self.assertIn('id', data)
-        self.assertEqual(data['id'], 0)
+        self.assertNotIn('_id', data)
         self.assertIn('first_name', data)
         self.assertEqual(data['first_name'], "Arturo")
         self.assertIn('last_name', data)
@@ -115,11 +129,11 @@ class TestCustomers(unittest.TestCase):
 
     def test_deserialize_a_customer(self):
         """ Test deserialization of a Customer """
-        data = {"id": 1, "first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True}
+        data = {"first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True}
         customer = Customer()
         customer.deserialize(data)
         self.assertNotEqual(customer, None)
-        self.assertEqual(customer.id, 0)  # id should be ignored
+        self.assertEqual(customer.id, None)  # id should be ignored
         self.assertEqual(customer.first_name, "Arturo")
         self.assertEqual(customer.last_name, "Frank")
 
@@ -135,27 +149,38 @@ class TestCustomers(unittest.TestCase):
 
     def test_find_customer(self):
         """ Find a Customer by ID """
-        Customer(0, "Hey", "Jude").save()
-        Customer(0, "Beatles", "Band").save()
-        customer = Customer.find(2)
+        Customer("Hey", "Jude").save()
+        # saved_pet = Pet("kitty", "cat").save()
+        saved_customer = Customer("kitty", "cat")
+        saved_customer.save()
+        customer = Customer.find(saved_customer.id)
         self.assertIsNot(customer, None)
-        self.assertEqual(customer.id, 2)
-        self.assertEqual(customer.first_name, "Beatles")
+        self.assertEqual(customer.id, saved_customer.id)
+        self.assertEqual(customer.first_name, "kitty")
 
     def test_customer_not_found(self):
         """ Test for a Customer that doesn't exist """
-        Customer(0, "Arturo", "Frank").save()
-        customer = Customer.find(2)
+        Customer("Arturo", "Frank").save()
+        customer = Customer.find("2")
         self.assertIs(customer, None)
 
     def test_find_by_query(self):
         """ Find Customers by Category """
-        Customer(0, "Arturo", "Frank").save()
-        Customer(0, "Hey", "Jude").save()
-        customers = Customer.find_by_query("last_name", "Frank")
+        Customer("Arturo", "Frank").save()
+        Customer("Hey", "Jude").save()
+        customers = Customer.find_by_query(last_name="Frank")
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].last_name, "Frank")
-
+    
+    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
+    def test_vcap_services(self):
+        """ Test if VCAP_SERVICES works """
+        Customer.init_db()
+        self.assertIsNotNone(Customer.client)
+        Customer("fido", "dog", True).save()
+        customer = Customer.find_by_query(first_name="fido")
+        self.assertNotEqual(len(customer), 0)
+        self.assertEqual(customer[0].first_name, "fido")
 ######################################################################
 #   M A I N
 ######################################################################
