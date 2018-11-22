@@ -26,6 +26,8 @@ import time # use for rate limiting Cloudant Lite :(
 import unittest
 from mock import patch
 from service.models import Customer, DataValidationError
+from requests import HTTPError, ConnectionError
+
 
 ######################################################################
 #  T E S T   C A S E S
@@ -171,7 +173,7 @@ class TestCustomers(unittest.TestCase):
         customers = Customer.find_by_query(last_name="Frank")
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].last_name, "Frank")
-    
+
     @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
     def test_vcap_services(self):
         """ Test if VCAP_SERVICES works """
@@ -181,6 +183,9 @@ class TestCustomers(unittest.TestCase):
         customer = Customer.find_by_query(first_name="fido")
         self.assertNotEqual(len(customer), 0)
         self.assertEqual(customer[0].first_name, "fido")
+    
+    def test_connection(self):
+        self.assertRaises(ConnectionError, Customer.init_db())
 ######################################################################
 #   M A I N
 ######################################################################

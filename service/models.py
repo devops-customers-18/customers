@@ -198,17 +198,6 @@ class Customer(object):
 ######################################################################
 
     @classmethod
-    def find_by(cls, **kwargs):
-        """ Find records using selector """
-        query = Query(cls.database, selector=kwargs)
-        results = []
-        for doc in query.result:
-            customer = Customer()
-            customer.deserialize(doc)
-            results.append(customer)
-        return results
-
-    @classmethod
     def find(cls, customer_id):
         """ Finds a Customer by it's ID """
         try:
