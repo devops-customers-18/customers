@@ -33,6 +33,7 @@ class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
     pass
 
+
 class Customer(object):
     """
     Class that represents a Customer
@@ -67,7 +68,7 @@ class Customer(object):
 
     def create(self):
         """
-        Creates a new Customer in the database
+        Creates a new Customer in the databasePOST
         """
         if self.username is None:   # name is the only required field
             raise DataValidationError('username attribute is not set')
@@ -79,7 +80,7 @@ class Customer(object):
             return
 
         if document.exists():
-            self.id = document['_id']
+            self.id = str(document['_id'])
 
     def update(self):
         """
@@ -116,16 +117,16 @@ class Customer(object):
 
     def serialize(self):
         """ serializes a Customer into a dictionary """
-        customer = { "id": self.id,
-                     "first_name": self.first_name,
-                     "last_name": self.last_name,
-                     "address": self.address,
-                     "email": self.email,
-                     "username": self.username,
-                     "password": self.password,
-                     "phone_number": self.phone_number,
-                     "active": self.active
-                   }
+        customer = {"id": self.id,
+                    "first_name": self.first_name,
+                    "last_name": self.last_name,
+                    "address": self.address,
+                    "email": self.email,
+                    "username": self.username,
+                    "password": self.password,
+                    "phone_number": self.phone_number,
+                    "active": self.active
+                    }
 
         if self.id:
             customer['_id'] = self.id
@@ -152,7 +153,7 @@ class Customer(object):
             raise DataValidationError('Invalid customer: missing ' + error.args[0])
         except TypeError as error:
             raise DataValidationError('Invalid customer: body of request contained bad or no data')
-        
+
         # if there is no id and the data has one, assign it
         if not self.id and '_id' in data:
             self.id = data['_id']
@@ -266,8 +267,8 @@ class Customer(object):
                 opts['url'] = cloudant_service['credentials']['url']
 
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
-            Customer.logger.info('Error - Failed to retrieve options. ' \
-                             'Check that app is bound to a Cloudant service.')
+            Customer.logger.info('Error - Failed to retrieve options. '
+                                 'Check that app is bound to a Cloudant service.')
             exit(-1)
 
         Customer.logger.info('Cloudant Endpoint: %s', opts['url'])
@@ -277,7 +278,7 @@ class Customer(object):
                                        url=opts['url'],
                                        connect=True,
                                        auto_renew=True
-                                      )
+                                       )
         except ConnectionError:
             raise AssertionError('Cloudant service could not be reached')
 
