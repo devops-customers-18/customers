@@ -25,8 +25,8 @@ from service.resources import DisableAction
 
 api.add_resource(HomePage, '/')
 api.add_resource(CustomerCollection, '/customers')
-api.add_resource(CustomerResource, '/customers/<int:customer_id>')
-api.add_resource(DisableAction, '/customers/<int:customer_id>/disable')
+api.add_resource(CustomerResource, '/customers/<customer_id>')
+api.add_resource(DisableAction, '/customers/<customer_id>/disable')
 
 #  import service
 
@@ -42,6 +42,7 @@ app.logger.info('************************************************************')
 app.logger.info('     C U S T O M E R   R E S T   A P I   S E R V I C E ')
 app.logger.info('************************************************************')
 app.logger.info('Logging established')
+
 
 @app.before_first_request
 def init_db(dbname="customers"):

@@ -197,6 +197,17 @@ class Customer(object):
 ######################################################################
 #  F I N D E R   M E T H O D S
 ######################################################################
+    @classmethod
+    def find_by(cls, **kwargs):
+        """ Find records using selector """
+        query = Query(cls.database, selector=kwargs)
+        results = []
+        for doc in query.result:
+            customer = Customer()
+            customer.deserialize(doc)
+            results.append(customer)
+        # return [doc for doc in query.result]
+        return results
 
     @classmethod
     def find(cls, customer_id):
@@ -223,7 +234,18 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
+            # results.append(customer)
         return results
+
+    @classmethod
+    def find_by_name(cls, username):
+        """ Query that finds Pets by their name """
+        return cls.find_by(username=username)
+
+    @classmethod
+    def find_by_address(cls, address):
+        """ Query that finds Pets by their name """
+        return cls.find_by(address=address)
 
 ############################################################
 #  C L O U D A N T   D A T A B A S E   C O N N E C T I O N
