@@ -12,6 +12,7 @@ from service.models import Customer, DataValidationError
 #  PATH: /pets/{id}
 ######################################################################
 
+
 class CustomerResource(Resource):
     """
     CustomerResource class
@@ -42,8 +43,10 @@ class CustomerResource(Resource):
         """
         app.logger.info('Updating a Customer with id [{}]'.format(customer_id))
 
-        content_type = request.headers.get('Content-Type')
+        content_type = request.headers.get('content_type')
+
         if not content_type or content_type != 'application/json':
+            app.logger.info('11111111')
             abort(status.HTTP_400_BAD_REQUEST, "No Content-Type set")
 
         customer = Customer.find(customer_id)
