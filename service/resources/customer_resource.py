@@ -75,3 +75,12 @@ class CustomerResource(Resource):
         if customer:
             customer.delete()
         return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+# DELETE ALL PET DATA (for testing only)
+######################################################################
+    @app.route('/customers/reset', methods=['DELETE'])
+    def customers_reset():
+        """ Removes all customers from the database """
+        Customer.remove_all()
+        return '', status.HTTP_204_NO_CONTENT

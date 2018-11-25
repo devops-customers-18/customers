@@ -19,14 +19,19 @@ BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
 def step_impl(context):
     """ Delete all Pets and load new ones """
     headers = {'Content-Type': 'application/json'}
-    context.resp = requests.delete(context.base_url + '/pets/reset', headers=headers)
+    context.resp = requests.delete(context.base_url + '/customers/reset', headers=headers)
     expect(context.resp.status_code).to_equal(204)
-    create_url = context.base_url + '/pets'
+    create_url = context.base_url + '/customers'
     for row in context.table:
         data = {
-            "name": row['name'],
-            "category": row['category'],
-            "available": row['available'] in ['True', 'true', '1']
+            "first_name": row['first_name'],
+            "last_name": row['last_name'],
+            "address": row['address'],
+            "email": row['email'],
+            "username": row['username'],
+            "password": row['password'],
+            "phone_number": row['phone_number'],
+            "active": row['active'] in ['True', 'true', '1']
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
@@ -41,7 +46,12 @@ def step_impl(context):
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
+    #print(context)
+    #print(context.driver.message.name)
     expect(context.driver.title).to_contain(message)
+
+    #print()
+    #assert message in context.resp.data
 
 @then('I should not see "{message}"')
 def step_impl(context, message):
@@ -50,9 +60,12 @@ def step_impl(context, message):
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = 'pet_' + element_name.lower()
+    #element_id = 'pet_' + element_name.lower()
+    element_id = element_name.lower()
     element = context.driver.find_element_by_id(element_id)
+    #print(element.text)
     element.clear()
+    print(text_string) 
     element.send_keys(text_string)
 
 ##################################################################
@@ -71,6 +84,7 @@ def step_impl(context, button):
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
+    #print(element.text)
     expect(element.text).to_contain(name)
     # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
     #     expected_conditions.text_to_be_present_in_element(
@@ -89,7 +103,9 @@ def step_impl(context, name):
 @then('I should see the message "{message}"')
 def step_impl(context, message):
     element = context.driver.find_element_by_id('flash_message')
+    print("1111" + element.text)
     expect(element.text).to_contain(message)
+
     # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
     #     expected_conditions.text_to_be_present_in_element(
     #         (By.ID, 'flash_message'),
