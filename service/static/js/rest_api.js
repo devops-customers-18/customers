@@ -8,7 +8,7 @@ $(function () {
     function update_form_data(res) {
         //$("#_id").val(res.id);
         //$("#pet_name").val(res.name);
-        $("first_name").val(res.first_name);
+        $("#first_name").val(res.first_name);
         //$("#pet_category").val(res.category);
         $("#last_name").val(res.last_name);
         $("#address").val(res.address);
@@ -134,7 +134,7 @@ $(function () {
 
         var customer_id = $("#id").val();
 
-        //flash_message("customer_id: " + customers_id) 
+        //flash_message("customer_id: " + customers_id) ; 
 
         var ajax = $.ajax({
             type: "GET",
@@ -145,15 +145,18 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            //print(res)
+            //print(resi)
             update_form_data(res)
             flash_message("Success")
         });
 
         ajax.fail(function(res){
+            //flash_message("customer_id fail: " + customers_id) 
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
+
+        //flash_message("customer_id: " + customers_id) ;*/
 
     });
 

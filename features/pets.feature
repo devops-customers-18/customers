@@ -73,7 +73,4 @@ Scenario: Update a Pet
     When I set the "Id" to "1"
     And I press the "Retrieve" button
     Then I should see "Boxer" in the "first_name" field
-    When I press the "Clear" button
-    And I press the "Search" button
-    Then I should see "Boxer" in the results
-    Then I should not see "fido" in the results
+    

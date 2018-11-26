@@ -135,7 +135,7 @@ def step_impl(context, text_string, element_name):
     #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
     element = context.driver.find_element_by_id(element_id)
-    #print(element.get_attribute('value'))
+    print(element.text)
     expect(element.get_attribute('value')).to_equal(text_string)
     # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
     #     expected_conditions.text_to_be_present_in_element_value(
