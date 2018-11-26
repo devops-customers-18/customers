@@ -51,7 +51,6 @@ class TestCustomers(unittest.TestCase):
 
     def setUp(self):
         """ Initialize the Cloudant database """
-        print("What the funct")
         Customer.init_db('test')
         Customer.remove_all()
     
@@ -71,6 +70,12 @@ class TestCustomers(unittest.TestCase):
         self.assertEqual(customer.password, "password")
         self.assertEqual(customer.phone_number, "1231231234")
         self.assertEqual(customer.active, True)
+        customer2 = Customer(first_name='ac',
+                             last_name='bd',
+                             username=None,
+                             password='poi')
+        self.assertRaises(DataValidationError, customer2.create)
+        self.assertRaises(DataValidationError, customer2.save)
 
     def test_add_a_customer(self):
         """ Create a customer and add it to the database """
@@ -174,6 +179,22 @@ class TestCustomers(unittest.TestCase):
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].last_name, "Frank")
 
+    def test_find_by_name(self):
+        """ Find Customers by Username """
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer.save()
+        customers = Customer.find_by_query(username="IAmUser")
+        self.assertNotEqual(len(customers), 0)
+        self.assertEqual(customers[0].username, "IAmUser")
+
+    def test_find_by_address(self):
+        """ Find Customers by Address """
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer.save()
+        customers = Customer.find_by_query(address="USA")
+        self.assertNotEqual(len(customers), 0)
+        self.assertEqual(customers[0].address, "USA")
+
     @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
     def test_vcap_services(self):
         """ Test if VCAP_SERVICES works """
@@ -183,7 +204,7 @@ class TestCustomers(unittest.TestCase):
         customer = Customer.find_by_query(first_name="fido")
         self.assertNotEqual(len(customer), 0)
         self.assertEqual(customer[0].first_name, "fido")
-    
+
     def test_connection(self):
         self.assertRaises(ConnectionError, Customer.init_db())
 ######################################################################

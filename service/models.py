@@ -68,7 +68,7 @@ class Customer(object):
 
     def create(self):
         """
-        Creates a new Customer in the databasePOST
+        Creates a new Customer in the database POST
         """
         if self.username is None:   # name is the only required field
             raise DataValidationError('username attribute is not set')
