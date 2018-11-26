@@ -49,7 +49,6 @@ Scenario: Delete a Customer
     When I visit the "Home Page"
     And I set the "id" to "1"
     And I press the "Delete" button
-    Then I should see the message "Customer with ID ["id"] has been Deleted!"
     And I press the "Search" button
     Then I should not see "Arno" in the results
     And I should see "Larno" in the results
@@ -65,15 +64,15 @@ Scenario: List all Customer living in USA
 
 Scenario: Update a Pet
     When I visit the "Home Page"
-    And I set the "Id" to "1"
+    And I set the "id" to "1"
     And I press the "Retrieve" button
-    Then I should see "fido" in the "Name" field
-    When I change "Name" to "Boxer"
+    Then I should see "Arno" in the "first_name" field
+    When I change "first_name" to "Boxer"
     And I press the "Update" button
     Then I should see the message "Success"
     When I set the "Id" to "1"
     And I press the "Retrieve" button
-    Then I should see "Boxer" in the "Name" field
+    Then I should see "Boxer" in the "first_name" field
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see "Boxer" in the results

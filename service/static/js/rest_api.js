@@ -10,11 +10,17 @@ $(function () {
         //$("#pet_name").val(res.name);
         $("first_name").val(res.first_name);
         //$("#pet_category").val(res.category);
-        $("#pet_name").val(res.name);
-        if (res.available == true) {
-            $("#pet_available").val("true");
+        $("#last_name").val(res.last_name);
+        $("#address").val(res.address);
+        $("#email").val(res.email);
+        $("#username").val(res.username);
+        $("#password").val(res.password);
+        $("#phone_number").val(res.phone_number);
+
+        if (res.active == true) {
+            $("#active").val("true");
         } else {
-            $("#pet_available").val("false");
+            $("active").val("false");
         }
     }
 
@@ -81,20 +87,30 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var customer_id = $("#id").val();
+        var first_name = $("#first_name").val();
+        var last_name = $("#last_name").val();
+        var address = $("#address").val();
+        var email = $("#email").val();
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var phone_number = $("#phone_number").val();
+        var active = $("#active").val() == "true";
 
         var data = {
-            "name": name,
-            "category": category,
-            "available": available
+            "first_name": first_name,
+            "last_name": last_name,
+            "address": address,
+            "email": email,
+            "username": username,
+            "password": password,
+            "phone_number": phone_number,
+            "active": active
         };
 
         var ajax = $.ajax({
                 type: "PUT",
-                url: "/customers/" + pet_id,
+                url: "/customers/" + customer_id,
                 contentType:"application/json",
                 data: JSON.stringify(data)
             })
@@ -116,17 +132,20 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        var customer_id = $("#id").val();
+
+        //flash_message("customer_id: " + customers_id) 
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/customers/" + pet_id,
+            url: "/customers/" + customer_id,
             contentType:"application/json",
             data: ''
         })
 
         ajax.done(function(res){
             //alert(res.toSource())
+            //print(res)
             update_form_data(res)
             flash_message("Success")
         });
@@ -139,25 +158,26 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Customer
     // ****************************************
 
     $("#delete-btn").click(function () {
 
         var customers_id = $("#id").val();
 
-        flash_message("Customer with id:" + customers_id + "with Delete")
+        //flash_message("Customer with id:" + customers_id + "with Delete")
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/customer/" + customers_id,
+            url: "/customers/" + customers_id,
             contentType:"application/json",
-            data: '',
+            data: ''
         })
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Customer with ID [" + res.id + "] has been Deleted!")
+            //flash_message("Customer with ID [" + res.id + "] has been Deleted!")
+            flash_message("Customer has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -171,7 +191,7 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#pet_id").val("");
+        $("#id").val("");
         clear_form_data()
     });
 
@@ -197,42 +217,42 @@ $(function () {
         }
         if (last_name) {
             if (queryString.length > 0) {
-                queryString += '&last_name' + last_name
+                queryString += '&last_name=' + last_name
             } else {
                 queryString += 'last_name=' + last_name
             }
         }
         if (address) {
             if (queryString.length > 0) {
-                queryString += 'address=' + address
+                queryString += '&address=' + address
             } else {
                 queryString += 'address=' + address
             }
         }
         if (email) {
             if (queryString.length > 0) {
-                queryString += '&email' + email
+                queryString += '&email=' + email
             } else {
                 queryString += 'email=' + email
             }
         }
         if (username) {
             if (queryString.length > 0) {
-                queryString += '&username' + username
+                queryString += '&username=' + username
             } else {
                 queryString += 'username=' + username
             }
         }
         if (password) {
             if (queryString.length > 0) {
-                queryString += '&password' + password
+                queryString += '&password=' + password
             } else {
                 queryString += 'password=' + password
             }
         }
         if (phone_number) {
             if (queryString.length > 0) {
-                queryString += '&phone_number' + phone_number
+                queryString += '&phone_number=' + phone_number
             } else {
                 queryString += 'phone_number=' + phone_number
             }
