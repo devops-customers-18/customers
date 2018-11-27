@@ -1,7 +1,8 @@
 """
 This module contains all of Resources for the Customer API
 """
-from flask import abort, request
+import json
+from flask import abort, request, make_response
 from flask_restful import Resource
 from flask_api import status
 from werkzeug.exceptions import BadRequest
@@ -15,12 +16,12 @@ from service.models import Customer, DataValidationError
 
 class CustomerResource(Resource):
     """
-    CustomerResource class
+    CustomerResource cla/ss
 
     Allows the manipulation of a single Customer
-    GET /customer/{id} - Returns a Customer with the id
-    PUT /customer/{id} - Updates a Customer with the id
-    DELETE /customer/{id} - Deletes a Customer with the id
+    GET /customers/{id} - Returns a Customer with the id
+    PUT /customers/{id} - Updates a Customer with the id
+    DELETE /customers/{id} - Deletes a Customer with the id
     """
 
     def get(self, customer_id):
@@ -31,11 +32,13 @@ class CustomerResource(Resource):
         customer = Customer.find(customer_id)
         if customer:
             message = customer.serialize()
+            print(message)
             return_code = status.HTTP_200_OK
         else:
             message = {'error': 'Customer with id: %s was not found' % str(customer_id)}
             return_code = status.HTTP_404_NOT_FOUND
         return message, return_code
+
 
     def put(self, customer_id):
         """
@@ -74,4 +77,13 @@ class CustomerResource(Resource):
         customer = Customer.find(customer_id)
         if customer:
             customer.delete()
+        return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+# DELETE ALL PET DATA (for testing only)
+######################################################################
+    @app.route('/customers/reset', methods=['DELETE'])
+    def customers_reset():
+        """ Removes all customers from the database """
+        Customer.remove_all()
         return '', status.HTTP_204_NO_CONTENT
