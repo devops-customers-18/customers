@@ -174,11 +174,6 @@ class Customer(object):
         cls.client.disconnect()
 
     @classmethod
-    def create_query_index(cls, field_name, order='asc'):
-        """ Creates a new query index for searching """
-        cls.database.create_query_index(index_name=field_name, fields=[{field_name: order}])
-
-    @classmethod
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
@@ -234,7 +229,6 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
-            # results.append(customer)
         return results
 
     @classmethod
@@ -244,7 +238,7 @@ class Customer(object):
 
     @classmethod
     def find_by_address(cls, address):
-        """ Query that finds Pets by their name """
+        """ Query that finds Pets by their address """
         return cls.find_by(address=address)
 
 ############################################################

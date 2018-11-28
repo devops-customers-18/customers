@@ -46,6 +46,19 @@ VCAP_SERVICES = {
     ]
 }
 
+ERROR_VCAP_SERVICES = {
+    'cloudantNoSQLDB': [
+        {'credentials': {
+            'username': 'admin',
+            'password': 'nopass',
+            'host': '127.0.0.1',
+            'port': 5984,
+            'url': 'http://admin:pass@127.0.0.1:5984'
+            }
+        }
+    ]
+}
+
 class TestCustomers(unittest.TestCase):
     """ Test Cases for Customers """
 
