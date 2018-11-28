@@ -8,11 +8,11 @@ import json
 import requests
 from behave import *
 from compare import expect, ensure
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 
-# WAIT_SECONDS = 30
+WAIT_SECONDS = 30
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
 
 @given('the following pets')
@@ -93,16 +93,16 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-    element = context.driver.find_element_by_id('search_results')
+    #element = context.driver.find_element_by_id('search_results')
     #print("1111" + element.text)
-    expect(element.text).to_contain(name)
-    # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
-    #     expected_conditions.text_to_be_present_in_element(
-    #         (By.ID, 'search_results'),
-    #         name
-    #     )
-    # )
-    # expect(found).to_be(True)
+    #expect(element.text).to_contain(name)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+             (By.ID, 'search_results'),
+            name
+        )
+    )
+    expect(found).to_be(True)
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
@@ -112,16 +112,16 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    element = context.driver.find_element_by_id('flash_message')
-    expect(element.text).to_contain(message)
+    #element = context.driver.find_element_by_id('flash_message')
+    #expect(element.text).to_contain(message)
 
-    # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
-    #     expected_conditions.text_to_be_present_in_element(
-    #         (By.ID, 'flash_message'),
-    #         message
-    #     )
-    # )
-    # expect(found).to_be(True)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+         expected_conditions.text_to_be_present_in_element(
+             (By.ID, 'flash_message'),
+             message
+        )
+    )
+    expect(found).to_be(True)
 
 ##################################################################
 # This code works because of the following naming convention:
@@ -134,25 +134,25 @@ def step_impl(context, message):
 def step_impl(context, text_string, element_name):
     #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
-    element = context.driver.find_element_by_id(element_id)
-    print(element.text)
-    expect(element.get_attribute('value')).to_equal(text_string)
-    # found = WebDriverWait(context.driver, WAIT_SECONDS).until(
-    #     expected_conditions.text_to_be_present_in_element_value(
-    #         (By.ID, element_id),
-    #         text_string
-    #     )
-    # )
-    # expect(found).to_be(True)
+    #element = context.driver.find_element_by_id(element_id)
+    #print(element.text)
+    #expect(element.get_attribute('value')).to_equal(text_string)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+         expected_conditions.text_to_be_present_in_element_value(
+             (By.ID, element_id),
+             text_string
+        )
+    )
+    expect(found).to_be(True)
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
-    element = context.driver.find_element_by_id(element_id)
-    # element = WebDriverWait(context.driver, WAIT_SECONDS).until(
-    #     expected_conditions.presence_of_element_located((By.ID, element_id))
-    # )
+    #element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+         expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     element.clear()
     element.send_keys(text_string)
 
