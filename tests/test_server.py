@@ -70,16 +70,12 @@ class TestCustomerServer(unittest.TestCase):
     def tearDown(self):
         """ Runs after each test """
         Customer.remove_all()
-
+        
     def test_index(self):
         """ Test the Home Page """
         resp = self.app.get('/')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        data = json.loads(resp.data)
-        #expect(resp.title).to_contain('Customer Demo REST API Service')
-        #self.assertEqual(resp.title, 'Customer Demo REST API Service')
-        self.assertEqual(data['name'], 'Customer Demo REST API Service')
+        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertIn('Customer Demo RESTful Service', resp.data)
 
     def test_get_customer_list_without_queries(self):
         """ Get a list of Customer """
