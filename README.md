@@ -1,4 +1,7 @@
 # customers
+
+[![Build Status](https://travis-ci.org/devops-customers-18/customers.svg?branch=master)](https://travis-ci.org/devops-customers-18/customers)
+
 It is to build the `/customers` resource.
 
 ## Prerequisite Installation using Vagrant
