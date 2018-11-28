@@ -10,12 +10,13 @@ from . import CustomerCollection
 # GET /
 ######################################################################
 class HomePage(Resource):
-    """ Resource fior the Home Page """
+    """ Resource for the Home Page """
     def get(self):
         """ Return something useful by default """
-        message = {
-            'name': 'Customer Demo REST API Service',
-            'version': '1.0',
-            'url': api.url_for(CustomerCollection)
-        }
-        return message, status.HTTP_200_OK
+        #message = {
+        #    'name': 'Customer Demo REST API Service',
+        #    'version': '1.0',
+        #    'url': api.url_for(CustomerCollection)
+        #}
+        #return message, status.HTTP_200_OK
+        return app.send_static_file('index.html')

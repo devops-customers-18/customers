@@ -77,6 +77,8 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data = json.loads(resp.data)
+        #expect(resp.title).to_contain('Customer Demo REST API Service')
+        #self.assertEqual(resp.title, 'Customer Demo REST API Service')
         self.assertEqual(data['name'], 'Customer Demo REST API Service')
 
     def test_get_customer_list_without_queries(self):
@@ -320,6 +322,7 @@ class TestCustomerServer(unittest.TestCase):
         resp = self.app.get('/customers', query_string='address=ny')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) >= 0)
+        # print(resp.data)
         # self.assertTrue('fido' in resp.data)
         # self.assertFalse('afido' in resp.data)
         # data = json.loads(resp.data)

@@ -33,13 +33,23 @@ class CustomerCollection(Resource):
             # Query customers by name
             app.logger.info('Filtering by username:%s', username)
             results = Customer.find_by_name(username)
+
+            message = [customer.serialize() for customer in results]
+            return_code = status.HTTP_200_OK
+        elif address:
+            # Query customers by name
+            app.logger.info('Filtering by username:%s', username)
+            results = Customer.find_by_address(address)
+
             message = [customer.serialize() for customer in results]
             return_code = status.HTTP_200_OK
 
         elif request.args:
             # Query customers by query
-            app.logger.info('Filtering by quesry:%s', request.args.keys())
+            #key = request.args.keys()
+            app.logger.info('Filtering by query:%s', request.args.keys())
             results = Customer.find_by(kwargs=request.args)
+            #results = Customer.find_by_query({key:request.args.get(key)})
             message = [customer.serialize() for customer in results]
             return_code = status.HTTP_200_OK
         else:
