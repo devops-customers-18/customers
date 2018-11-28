@@ -1,8 +1,6 @@
 # customers
 
-[![Build Status](https://travis-ci.org/devops-customers-18/customers.svg?branch=master)](https://travis-ci.org/devops-customers-18/customers)
-
-[![codecov](https://codecov.io/gh/devops-customers-18/customers/branch/master/graph/badge.svg)](https://codecov.io/gh/devops-customers-18/customers)
+[![Build Status](https://travis-ci.org/devops-customers-18/customers.svg?branch=master)](https://travis-ci.org/devops-customers-18/customers) [![codecov](https://codecov.io/gh/devops-customers-18/customers/branch/master/graph/badge.svg)](https://codecov.io/gh/devops-customers-18/customers)
 
 It is to build the `/customers` resource.
 
