@@ -33,6 +33,8 @@ class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
     pass
 
+class DatabaseConnectionError(ConnectionError):
+    pass
 
 class Customer(object):
     """
@@ -68,7 +70,7 @@ class Customer(object):
 
     def create(self):
         """
-        Creates a new Customer in the databasePOST
+        Creates a new Customer in the database POST
         """
         if self.username is None:   # name is the only required field
             raise DataValidationError('username attribute is not set')
@@ -164,21 +166,6 @@ class Customer(object):
 ######################################################################
 
     @classmethod
-    def connect(cls):
-        """ Connect to the server """
-        cls.client.connect()
-
-    @classmethod
-    def disconnect(cls):
-        """ Disconnect from the server """
-        cls.client.disconnect()
-
-    @classmethod
-    def create_query_index(cls, field_name, order='asc'):
-        """ Creates a new query index for searching """
-        cls.database.create_query_index(index_name=field_name, fields=[{field_name: order}])
-
-    @classmethod
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
@@ -234,7 +221,6 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
-            # results.append(customer)
         return results
 
     @classmethod
@@ -244,7 +230,7 @@ class Customer(object):
 
     @classmethod
     def find_by_address(cls, address):
-        """ Query that finds Pets by their name """
+        """ Query that finds Pets by their address """
         return cls.find_by(address=address)
 
 ############################################################
@@ -252,7 +238,7 @@ class Customer(object):
 ############################################################
 
     @staticmethod
-    def init_db(dbname='customers'):
+    def init_db(dbname='customers', connect=True):
         """
         Initialized Coundant database connection
         """
@@ -298,11 +284,12 @@ class Customer(object):
             Customer.client = Cloudant(opts['username'],
                                        opts['password'],
                                        url=opts['url'],
-                                       connect=True,
+                                       connect=connect,
                                        auto_renew=True
                                        )
+
         except ConnectionError:
-            raise AssertionError('Cloudant service could not be reached')
+            raise DatabaseConnectionError('Cloudant service could not be reached')
 
         # Create database if it doesn't exist
         try:

@@ -69,15 +69,18 @@ class CustomerCollection(Resource):
 
         if content_type == 'application/x-www-form-urlencoded':
             app.logger.info('Processing FORM data')
+            app.logger.info(request.form)
+            app.logger.info(type(request.form))
+
             data = {
-                'username': request.form['name'],
-                'password': request.form['category'],
-                'first_name': request.form['available'],
-                'last_name': request.form['available'],
+                'username': request.form['username'],
+                'password': request.form['password'],
+                'first_name': request.form['first_name'],
+                'last_name': request.form['last_name'],
                 'address': request.form['address'],
                 'phone_number': request.form['phone_number'],
                 'active': request.form['active'],
-                'email': request.form['active'],
+                'email': request.form['email'],
             }
         elif content_type == 'application/json':
             app.logger.info('Processing JSON data')
@@ -86,7 +89,6 @@ class CustomerCollection(Resource):
             message = 'Unsupported Content-Type: {}'.format(content_type)
             app.logger.info(message)
             abort(status.HTTP_400_BAD_REQUEST, message)
-
         customer = Customer()
         try:
             customer.deserialize(data)

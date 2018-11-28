@@ -49,7 +49,6 @@ class CustomerResource(Resource):
         content_type = request.headers.get('content_type')
 
         if not content_type or content_type != 'application/json':
-            app.logger.info('11111111')
             abort(status.HTTP_400_BAD_REQUEST, "No Content-Type set")
 
         customer = Customer.find(customer_id)

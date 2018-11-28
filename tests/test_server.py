@@ -70,16 +70,12 @@ class TestCustomerServer(unittest.TestCase):
     def tearDown(self):
         """ Runs after each test """
         Customer.remove_all()
-
+        
     def test_index(self):
         """ Test the Home Page """
         resp = self.app.get('/')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        data = json.loads(resp.data)
-        #expect(resp.title).to_contain('Customer Demo REST API Service')
-        #self.assertEqual(resp.title, 'Customer Demo REST API Service')
-        self.assertEqual(data['name'], 'Customer Demo REST API Service')
+        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertIn('Customer Demo RESTful Service', resp.data)
 
     def test_get_customer_list_without_queries(self):
         """ Get a list of Customer """
@@ -154,6 +150,38 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.post('/customers', data=data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_customer_form_content_type(self):
+        """ Create a Customer with form Content-Type """
+        customers_count = self.get_customers_count()
+        new_customer = {"username": "foo111", "password": "bar",
+                        "first_name": "value1", "last_name": "value2",
+                        "address": "Jersey", "phone_number": "773",
+                        "active": True, "email": "3333"}
+
+        resp = self.app.post('/customers', data=new_customer, content_type='application/x-www-form-urlencoded')
+        self.assertEqual(resp.status_code, HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get('Location', None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['username'], 'foo111')
+        self.assertEqual(new_json['first_name'], 'value1')
+        self.assertEqual(new_json['last_name'], 'value2')
+        self.assertEqual(new_json['address'], 'Jersey')
+        self.assertEqual(new_json['email'], '3333')
+        self.assertEqual(new_json['password'], 'bar')
+        self.assertEqual(new_json['phone_number'], '773')
+
+        # check that count has gone up and includes sammy
+        resp = self.app.get('/customers')
+        data = json.loads(resp.data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), customers_count + 1)
+        self.assertIn(new_json, data)
 
     def test_create_customer_with_no_name(self):
         """ Create a customer with the name missing """
