@@ -25,7 +25,7 @@ import json
 import time # use for rate limiting Cloudant Lite :(
 import unittest
 from mock import patch
-from service.models import Customer, DataValidationError
+from service.models import Customer, DataValidationError, DatabaseConnectionError
 from requests import HTTPError, ConnectionError
 
 
@@ -38,19 +38,6 @@ VCAP_SERVICES = {
         {'credentials': {
             'username': 'admin',
             'password': 'pass',
-            'host': '127.0.0.1',
-            'port': 5984,
-            'url': 'http://admin:pass@127.0.0.1:5984'
-            }
-        }
-    ]
-}
-
-ERROR_VCAP_SERVICES = {
-    'cloudantNoSQLDB': [
-        {'credentials': {
-            'username': 'admin',
-            'password': 'nopass',
             'host': '127.0.0.1',
             'port': 5984,
             'url': 'http://admin:pass@127.0.0.1:5984'
@@ -218,8 +205,6 @@ class TestCustomers(unittest.TestCase):
         self.assertNotEqual(len(customer), 0)
         self.assertEqual(customer[0].first_name, "fido")
 
-    def test_connection(self):
-        self.assertRaises(ConnectionError, Customer.init_db())
 ######################################################################
 #   M A I N
 ######################################################################

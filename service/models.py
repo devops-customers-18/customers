@@ -33,6 +33,8 @@ class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
     pass
 
+class DatabaseConnectionError(ConnectionError):
+    pass
 
 class Customer(object):
     """
@@ -164,16 +166,6 @@ class Customer(object):
 ######################################################################
 
     @classmethod
-    def connect(cls):
-        """ Connect to the server """
-        cls.client.connect()
-
-    @classmethod
-    def disconnect(cls):
-        """ Disconnect from the server """
-        cls.client.disconnect()
-
-    @classmethod
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
@@ -246,7 +238,7 @@ class Customer(object):
 ############################################################
 
     @staticmethod
-    def init_db(dbname='customers'):
+    def init_db(dbname='customers', connect=True):
         """
         Initialized Coundant database connection
         """
@@ -292,11 +284,12 @@ class Customer(object):
             Customer.client = Cloudant(opts['username'],
                                        opts['password'],
                                        url=opts['url'],
-                                       connect=True,
+                                       connect=connect,
                                        auto_renew=True
                                        )
+
         except ConnectionError:
-            raise AssertionError('Cloudant service could not be reached')
+            raise DatabaseConnectionError('Cloudant service could not be reached')
 
         # Create database if it doesn't exist
         try:
