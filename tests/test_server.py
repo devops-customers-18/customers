@@ -156,6 +156,7 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.post('/customers', data=data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        sleep(0.5)
 
     def test_create_customer_form_content_type(self):
         """ Create a Customer with form Content-Type """
@@ -263,6 +264,7 @@ class TestCustomerServer(unittest.TestCase):
         customer = self.get_customer('kerker')[0]
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        sleep(0.5)
 
     def test_update_customer_with_no_name(self):
         """ Update a customer with no username """
@@ -275,6 +277,7 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        sleep(0.5)
 
     def test_update_customer_not_found(self):
         """ Update a Customer that can't be found """
@@ -369,6 +372,7 @@ class TestCustomerServer(unittest.TestCase):
         self.assertGreater(len(resp.data), 0)
         self.assertIn(username, resp.data)
         data = json.loads(resp.data)
+        sleep(0.5)
         return data
 
     def get_customers_count(self):
@@ -376,6 +380,7 @@ class TestCustomerServer(unittest.TestCase):
         resp = self.app.get('/customers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
+        sleep(0.5)
         return len(data)
 
 
