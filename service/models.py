@@ -277,8 +277,8 @@ class Customer(object):
         # opts['port'] = vcap_services['port']
         # opts['url'] = vcap_services['url']
         Customer.logger.info("Mananananana")
-        Customer.logger.info(cloudant_service)
-        print(cloudant_service)
+        Customer.logger.info(vcap_services)
+        print(vcap_services)
 
         # Look for Cloudant in VCAP_SERVICES
         for service in vcap_services:
