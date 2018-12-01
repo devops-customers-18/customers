@@ -253,7 +253,6 @@ class Customer(object):
             creds = json.loads(os.environ['VCAP_SERVICES'])
             vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
             Customer.logger.info(vcap_services)
-            Customer.logger.info(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
             Customer.logger.info('Found Kubernetes Bindings')

@@ -123,6 +123,7 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
+        sleep(0.5)
 
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -168,11 +169,11 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.post('/customers', data=new_customer, content_type='application/x-www-form-urlencoded')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
-
+        
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertIsNotNone(location)
-
+        sleep(0.5)
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
@@ -212,6 +213,7 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        sleep(0.5)
 
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -241,6 +243,7 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        sleep(0.5)
 
         resp = self.app.get('/customers/{}'.format(customer['_id']))
         new_json = json.loads(resp.data)
@@ -297,9 +300,11 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.put('/customers/{}/disable'.format(customer['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        sleep(0.5)
 
         resp = self.app.get('/customers/{}'.format(customer['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        sleep(0.5)
 
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['active'], 'False')
@@ -323,7 +328,7 @@ class TestCustomerServer(unittest.TestCase):
         # delete a customer
         customer = self.get_customer('Ker')[0]  # returns a list
         resp = self.app.delete('/customers/{}'.format(customer['_id']), content_type='application/json')
-
+        sleep(0.5)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         new_count = self.get_customers_count()
