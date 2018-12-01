@@ -277,6 +277,13 @@ class Customer(object):
                 opts['host'] = cloudant_service['credentials']['host']
                 opts['port'] = cloudant_service['credentials']['port']
                 opts['url'] = cloudant_service['credentials']['url']
+        
+        opts['username'] = vcap_services['username']
+        opts['password'] = vcap_services['password']
+        opts['host'] = vcap_services['host']
+        opts['port'] = vcap_services['port']
+        opts['url'] = vcap_services['url']
+        
         Customer.logger.info(opts)
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
             Customer.logger.info('Error - Failed to retrieve options. '
