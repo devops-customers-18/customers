@@ -250,7 +250,8 @@ class Customer(object):
         # Try and get VCAP from the environment or a file if developing
         if 'VCAP_SERVICES' in os.environ:
             Customer.logger.info('Running in Bluemix mode.')
-            vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+            creds = json.loads(os.environ['VCAP_SERVICES'])
+            vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
             Customer.logger.info(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
