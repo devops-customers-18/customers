@@ -28,12 +28,15 @@ from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
 
+# get configruation from enviuronment (12-factor)
+ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
+CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
+CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
+CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
+
 
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
-    pass
-
-class DatabaseConnectionError(ConnectionError):
     pass
 
 class Customer(object):
@@ -256,11 +259,11 @@ class Customer(object):
         else:
             Customer.logger.info('VCAP_SERVICES and BINDING_CLOUDANT undefined.')
             creds = {
-                "username": "admin",
-                "password": "pass",
-                "host": '127.0.0.1',
+                "username": CLOUDANT_USERNAME,
+                "password": CLOUDANT_PASSWORD,
+                "host": CLOUDANT_HOST,
                 "port": 5984,
-                "url": "http://admin:pass@127.0.0.1:5984/"
+                "url": "http://"+CLOUDANT_HOST+":5984/"
             }
             vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
 
@@ -281,15 +284,18 @@ class Customer(object):
 
         Customer.logger.info('Cloudant Endpoint: %s', opts['url'])
         try:
+            if ADMIN_PARTY:
+                Customer.logger.info('Running in Admin Party Mode...')
             Customer.client = Cloudant(opts['username'],
-                                       opts['password'],
-                                       url=opts['url'],
-                                       connect=connect,
-                                       auto_renew=True
+                                        opts['password'],
+                                        url=opts['url'],
+                                        connect=True,
+                                        auto_renew=True,
+                                        admin_party=ADMIN_PARTY
                                        )
 
         except ConnectionError:
-            raise DatabaseConnectionError('Cloudant service could not be reached')
+            raise AssertionError('Cloudant service could not be reached')
 
         # Create database if it doesn't exist
         try:

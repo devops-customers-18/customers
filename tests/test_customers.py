@@ -25,7 +25,7 @@ import json
 import time # use for rate limiting Cloudant Lite :(
 import unittest
 from mock import patch
-from service.models import Customer, DataValidationError, DatabaseConnectionError
+from service.models import Customer, DataValidationError
 from requests import HTTPError, ConnectionError
 
 
