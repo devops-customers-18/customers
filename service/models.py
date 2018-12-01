@@ -268,6 +268,12 @@ class Customer(object):
             }
             vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
 
+        opts['username'] = vcap_services['username']
+        opts['password'] = vcap_services['password']
+        opts['host'] = vcap_services['host']
+        opts['port'] = vcap_services['port']
+        opts['url'] = vcap_services['url']
+
         # Look for Cloudant in VCAP_SERVICES
         for service in vcap_services:
             if service.startswith('cloudantNoSQLDB'):
@@ -277,12 +283,6 @@ class Customer(object):
                 opts['host'] = cloudant_service['credentials']['host']
                 opts['port'] = cloudant_service['credentials']['port']
                 opts['url'] = cloudant_service['credentials']['url']
-        
-        opts['username'] = vcap_services['username']
-        opts['password'] = vcap_services['password']
-        opts['host'] = vcap_services['host']
-        opts['port'] = vcap_services['port']
-        opts['url'] = vcap_services['url']
         
         Customer.logger.info(opts)
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
