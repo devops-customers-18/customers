@@ -251,6 +251,7 @@ class Customer(object):
         if 'VCAP_SERVICES' in os.environ:
             Customer.logger.info('Running in Bluemix mode.')
             vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+            Customer.logger.info(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
             Customer.logger.info('Found Kubernetes Bindings')
@@ -276,7 +277,7 @@ class Customer(object):
                 opts['host'] = cloudant_service['credentials']['host']
                 opts['port'] = cloudant_service['credentials']['port']
                 opts['url'] = cloudant_service['credentials']['url']
-
+        Customer.logger.info(opts)
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
             Customer.logger.info('Error - Failed to retrieve options. '
                                  'Check that app is bound to a Cloudant service.')
