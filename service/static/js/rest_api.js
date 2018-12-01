@@ -3,6 +3,13 @@ $(function () {
     // ****************************************
     //  U T I L I T Y   F U N C T I O N S
     // ****************************************
+    $('#active').on('change', function () {
+        if(this.checked) {
+            $(this).val('true');
+        } else {
+            $(this).val('false');
+        }
+    });
 
     // Updates the form with data from the response
     function update_form_data(res) {
@@ -39,7 +46,7 @@ $(function () {
 
     // ****************************************
     // Create a Pet
-    // ****************************************
+    // ****************************************    
 
     $("#create-btn").click(function () {
 
@@ -50,7 +57,7 @@ $(function () {
         var username = $("#username").val();
         var password = $("#password").val();
         var phone_number = $("#phone_number").val();
-        var active = $("#active").val() == "true";
+        var active = $('#active').prop("checked") ? true : false;
 
         var data = {
             "first_name": first_name,

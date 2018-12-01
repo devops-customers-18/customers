@@ -85,10 +85,17 @@ def step_impl(context, element_name, text_string):
 # id='clear-btn'. That allows us to lowercase the name and add '-btn'
 # to get the element id of any button
 ##################################################################
+@when('I select the "{checkbox}" option')
+def step_impl(context, checkbox):
+    # dropdown == 'active'
+    print(checkbox)
+    select_id = checkbox.lower()
+    context.driver.find_element_by_id(select_id).click()
 
 @when('I press the "{button}" button')
 def step_impl(context, button):
     button_id = button.lower() + '-btn'
+
     context.driver.find_element_by_id(button_id).click()
 
 @then('I should see "{name}" in the results')
