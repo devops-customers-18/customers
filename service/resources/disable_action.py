@@ -1,14 +1,16 @@
 from flask import abort, request
 from flask_api import status
 from flask_restful import Resource
-from service import app, api
+#from service import app, api
 from service.models import Customer
-
+from service import app, api, ns, Customer_model
 
 ######################################################################
 # DISABLE AN CUSTOMER
 ######################################################################
 
+@ns.route('/<customer_id>/active')
+@ns.param('customer_id', 'The Customer identifier')
 class DisableAction(Resource):
     """ Disable a Customer """
     def put(self, customer_id):

@@ -6,17 +6,18 @@ from flask import abort, request, make_response
 from flask_restful import Resource
 from flask_api import status
 from werkzeug.exceptions import BadRequest
-from service import app, api
+from service import app, api, ns, Customer_model
 from service.models import Customer, DataValidationError
 
 ######################################################################
 #  PATH: /pets/{id}
 ######################################################################
 
-
+@ns.route('/<customer_id>')
+@ns.param('customer_id', 'The customer identifier')
 class CustomerResource(Resource):
     """
-    CustomerResource cla/ss
+    CustomerResource class
 
     Allows the manipulation of a single Customer
     GET /customers/{id} - Returns a Customer with the id
@@ -24,6 +25,9 @@ class CustomerResource(Resource):
     DELETE /customers/{id} - Deletes a Customer with the id
     """
 
+    @ns.doc('get_customers')
+    @ns.response(404, 'Customer not found')
+    @ns.marshal_with(Customer_model)
     def get(self, customer_id):
         """
         Retrieve a single Customer
@@ -40,6 +44,11 @@ class CustomerResource(Resource):
         return message, return_code
 
 
+    @ns.doc('update_customer')
+    @ns.response(404, 'Customer not found')
+    @ns.response(400, 'The posted Customer data was not valid')
+    @ns.expect(Customer_model)
+    @ns.marshal_with(Customer_model)
     def put(self, customer_id):
         """
         Update a single Customer
@@ -68,6 +77,8 @@ class CustomerResource(Resource):
         return_code = status.HTTP_200_OK
         return message, return_code
 
+    @ns.doc('delete_customers')
+    @ns.response(204, 'Customer deleted')
     def delete(self, customer_id):
         """
         Delete a Customer
