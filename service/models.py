@@ -253,9 +253,9 @@ class Customer(object):
             Customer.logger.info('Running in Bluemix mode.')
             Customer.logger.info(os.environ['VCAP_SERVICES'])
             vcap_services = json.loads(os.environ['VCAP_SERVICES'])
-            #  = {"cloudantNoSQLDB": [{"credentials": creds}]}
             Customer.logger.info("Mananananana")
             Customer.logger.info(vcap_services)
+            print(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
             Customer.logger.info('Found Kubernetes Bindings')
@@ -279,7 +279,6 @@ class Customer(object):
         # opts['url'] = vcap_services['url']
         Customer.logger.info("Mananananana")
         Customer.logger.info(vcap_services)
-        print(vcap_services)
 
         # Look for Cloudant in VCAP_SERVICES
         for service in vcap_services:
