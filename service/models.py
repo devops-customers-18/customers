@@ -255,7 +255,7 @@ class Customer(object):
         """
         opts = {}
         vcap_services = {}
-        Customer.logger.info("Mananananana")
+
         # Try and get VCAP from the environment or a file if developing
         if 'VCAP_SERVICES' in os.environ:
             Customer.logger.info('Running in Bluemix mode.')

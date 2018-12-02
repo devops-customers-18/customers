@@ -195,28 +195,16 @@ class TestCustomers(unittest.TestCase):
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].address, "USA")
 
-    # @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
-    # def test_vcap_services(self):
-    #     """ Test if VCAP_SERVICES works """
-    #     Customer.init_db()
-    #     self.assertIsNotNone(Customer.client)
-    #     Customer("fido", "dog", True).save()
-    #     customer = Customer.find_by_query(first_name="fido")
-    #     self.assertNotEqual(len(customer), 0)
-    #     self.assertEqual(customer[0].first_name, "fido")
-
     @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
     def test_vcap_services(self):
         """ Test if VCAP_SERVICES works """
         Customer.init_db()
         self.assertIsNotNone(Customer.client)
+        Customer("fido", "dog", True).save()
+        customer = Customer.find_by_query(first_name="fido")
+        self.assertNotEqual(len(customer), 0)
+        self.assertEqual(customer[0].first_name, "fido")
 
-    # @patch('redis.Redis.ping')
-    # def test_redis_connection_error(self, ping_error_mock):
-    #     """ Test a Bad Redis connection """
-    #     ping_error_mock.side_effect = DatabaseConnectionError()
-    #     self.assertRaises(DatabaseConnectionError, Pet.init_db)
-    #     self.assertIsNone(Pet.redis)
 
 
 ######################################################################
