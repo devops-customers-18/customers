@@ -22,6 +22,7 @@ def step_impl(context):
     context.resp = requests.delete(context.base_url + '/customers/reset', headers=headers)
     expect(context.resp.status_code).to_equal(204)
     create_url = context.base_url + '/customers'
+    print(create_url)
     for row in context.table:
         data = {
             "first_name": row['first_name'],
