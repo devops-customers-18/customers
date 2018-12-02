@@ -3,7 +3,7 @@ from flask_api import status
 from flask_restful import Resource
 #from service import app, api
 from service.models import Customer
-from service import app, api, ns, Customer_model
+from service import app, api, apii, ns, Customer_model
 
 ######################################################################
 # DISABLE AN CUSTOMER

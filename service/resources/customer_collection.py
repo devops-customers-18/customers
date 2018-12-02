@@ -5,7 +5,7 @@ from flask import request, abort
 from flask_restful import Resource
 from flask_api import status
 from werkzeug.exceptions import BadRequest
-from service import app, api, ns, Customer_model
+from service import app, api, apii, ns, Customer_model
 from service.models import Customer, DataValidationError
 from . import CustomerResource
 

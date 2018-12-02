@@ -74,7 +74,7 @@ def step_impl(context, element_name, text_string):
         text_string = resp.json()
         #print(text_string[0]['_id']) 
         #print(type(text_string))
-        element.send_keys(text_string[id_int]['_id'])
+        element.send_keys(text_string[id_int]['id'])
         #print("customers_id: " + text_string[id_int]['_id'])
         return
     element.send_keys(text_string)

@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'please, tell nobody... Shhhh'
 app.config['LOGGING_LEVEL'] = logging.INFO
 
-#api = Api(app)
+api = Api(app)
 
 class Api(BaseApi):
     def _register_doc(self, app_or_blueprint):
@@ -33,7 +33,7 @@ class Api(BaseApi):
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
-api = Api(app,
+apii = Api(app,
           version='3.0.0',
           title='Customer REST API Service ',
           description='This is a customer server.',
@@ -41,11 +41,11 @@ api = Api(app,
          )
 
 # This namespace is the start of the path i.e., /cutomers
-ns = api.namespace('Customers',default=None, description='Customer operations')
-api.namespaces.pop(0)
+ns = apii.namespace('Customers',default=None, description='Customer operations')
+apii.namespaces.pop(0)
 
 # Define the model so that the docs reflect what can be sent
-Customer_model = api.model('Customer', {
+Customer_model = apii.model('Customer', {
     'id': fields.String(readOnly=True,
                          description='The unique id assigned internally by service'),
     'first_name': fields.String(required=True,
