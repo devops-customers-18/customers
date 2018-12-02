@@ -16,6 +16,7 @@ def before_all(context):
     context.driver.implicitly_wait(WAIT_SECONDS) # seconds
     context.driver.set_window_size(1120, 550)
     context.base_url = BASE_URL
+    print(context.base_url)
     # -- SET LOG LEVEL: behave --logging-level=ERROR ...
     # on behave command-line or in "behave.ini"
     context.config.setup_logging()
