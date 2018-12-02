@@ -46,7 +46,7 @@ apii.namespaces.pop(0)
 
 # Define the model so that the docs reflect what can be sent
 Customer_model = apii.model('Customer', {
-    'id': fields.String(readOnly=True,
+    '_id': fields.String(readOnly=True,
                          description='The unique id assigned internally by service'),
     'first_name': fields.String(required=True,
                           description='The first name of a Customer'),
@@ -54,13 +54,15 @@ Customer_model = apii.model('Customer', {
                               description='The last name of a Customer'),
     'address': fields.String(required=True,
                               description='The address of a Customer'),
+    'phone_number': fields.String(required=True,
+                              description='The phone_number of a Customer'),
     'email': fields.String(required=True,
                               description='The last name of a Customer'),
     'username': fields.String(required=True,
                               description='The last username of a Customer'),
     'password': fields.String(required=True,
                               description='The last password of a Customer'),
-    'active': fields.Boolean(required=True,
+    'active': fields.String(required=True,
                               description='The acive status of a Customer')
 })
 

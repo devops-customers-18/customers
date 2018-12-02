@@ -228,7 +228,7 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertNotEqual(new_json['id'], 999)
+        self.assertNotEqual(new_json['_id'], 999)
         sleep(0.5)
 
     def test_update_customer(self):
