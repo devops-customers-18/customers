@@ -27,6 +27,7 @@ import logging
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
+from circuitbreaker import circuit
 
 # get configruation from enviuronment (12-factor)
 ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
@@ -38,6 +39,7 @@ CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
     pass
+
 
 class Customer(object):
     """
@@ -71,6 +73,7 @@ class Customer(object):
                               "phone_number": phone_number,
                               "active": active}
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def create(self):
         """
         Creates a new Customer in the database POST
@@ -87,6 +90,7 @@ class Customer(object):
         if document.exists():
             self.id = str(document['_id'])
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def update(self):
         """
         Updates a Customer in the database
@@ -99,6 +103,7 @@ class Customer(object):
             document.update(self.serialize())
             document.save()
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def save(self):
         """
         Saves a Customer to the data store
@@ -110,6 +115,7 @@ class Customer(object):
         else:
             self.create()
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def delete(self):
         """ Removes a Customer from the data store """
         # Customer.data.remove(self)
@@ -120,6 +126,7 @@ class Customer(object):
         if document:
             document.delete()
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def serialize(self):
         """ serializes a Customer into a dictionary """
         customer = {"id": self.id,
@@ -137,6 +144,7 @@ class Customer(object):
             customer['_id'] = self.id
         return customer
 
+    @circuit(failure_threshold=10, expected_exception=ConnectionError)
     def deserialize(self, data):
         """
         Deserializes a Customer from a dictionary
@@ -267,7 +275,7 @@ class Customer(object):
                 "password": CLOUDANT_PASSWORD,
                 "host": CLOUDANT_HOST,
                 "port": 5984,
-                "url": "http://"+CLOUDANT_HOST+":5984/"
+                "url": "http://" + CLOUDANT_HOST + ":5984/"
             }
             vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
 
@@ -290,7 +298,7 @@ class Customer(object):
                 opts['host'] = cloudant_service['credentials']['host']
                 opts['port'] = cloudant_service['credentials']['port']
                 opts['url'] = cloudant_service['credentials']['url']
-        
+
         Customer.logger.info(opts)
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
             Customer.logger.info('Error - Failed to retrieve options. '
@@ -302,11 +310,11 @@ class Customer(object):
             if ADMIN_PARTY:
                 Customer.logger.info('Running in Admin Party Mode...')
             Customer.client = Cloudant(opts['username'],
-                                        opts['password'],
-                                        url=opts['url'],
-                                        connect=True,
-                                        auto_renew=True,
-                                        admin_party=ADMIN_PARTY
+                                       opts['password'],
+                                       url=opts['url'],
+                                       connect=True,
+                                       auto_renew=True,
+                                       admin_party=ADMIN_PARTY
                                        )
 
         except ConnectionError:

@@ -22,12 +22,11 @@ Test cases can be run with:
 
 import os
 import json
-import time # use for rate limiting Cloudant Lite :(
+import time  # use for rate limiting Cloudant Lite :(
 import unittest
 from mock import patch
 from service.models import Customer, DataValidationError
 from requests import HTTPError, ConnectionError
-
 
 ######################################################################
 #  T E S T   C A S E S
@@ -41,10 +40,11 @@ VCAP_SERVICES = {
             'host': '127.0.0.1',
             'port': 5984,
             'url': 'http://admin:pass@127.0.0.1:5984'
-            }
+        }
         }
     ]
 }
+
 
 class TestCustomers(unittest.TestCase):
     """ Test Cases for Customers """
@@ -53,7 +53,7 @@ class TestCustomers(unittest.TestCase):
         """ Initialize the Cloudant database """
         Customer.init_db('test')
         Customer.remove_all()
-    
+
     def tearDown(self):
         if 'VCAP_SERVICES' in os.environ:
             time.sleep(0.5)
@@ -204,6 +204,20 @@ class TestCustomers(unittest.TestCase):
     #     customer = Customer.find_by_query(first_name="fido")
     #     self.assertNotEqual(len(customer), 0)
     #     self.assertEqual(customer[0].first_name, "fido")
+
+    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
+    def test_vcap_services(self):
+        """ Test if VCAP_SERVICES works """
+        Customer.init_db()
+        self.assertIsNotNone(Customer.client)
+
+    # @patch('redis.Redis.ping')
+    # def test_redis_connection_error(self, ping_error_mock):
+    #     """ Test a Bad Redis connection """
+    #     ping_error_mock.side_effect = DatabaseConnectionError()
+    #     self.assertRaises(DatabaseConnectionError, Pet.init_db)
+    #     self.assertIsNone(Pet.redis)
+
 
 ######################################################################
 #   M A I N
