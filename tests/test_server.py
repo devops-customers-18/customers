@@ -23,6 +23,7 @@ Test cases can be run with:
 import unittest
 import logging
 import json
+import time
 from flask_api import status    # HTTP Status Codes
 from service import app
 from service.models import Customer
