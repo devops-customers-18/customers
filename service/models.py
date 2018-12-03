@@ -27,7 +27,7 @@ import logging
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
-from circuitbreaker import circuit
+from retry import retry
 
 # get configruation from enviuronment (12-factor)
 ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
@@ -73,7 +73,7 @@ class Customer(object):
                               "phone_number": phone_number,
                               "active": active}
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def create(self):
         """
         Creates a new Customer in the database POST
@@ -90,7 +90,7 @@ class Customer(object):
         if document.exists():
             self.id = str(document['_id'])
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def update(self):
         """
         Updates a Customer in the database
@@ -103,7 +103,7 @@ class Customer(object):
             document.update(self.serialize())
             document.save()
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def save(self):
         """
         Saves a Customer to the data store
@@ -115,7 +115,7 @@ class Customer(object):
         else:
             self.create()
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def delete(self):
         """ Removes a Customer from the data store """
         # Customer.data.remove(self)
@@ -126,7 +126,7 @@ class Customer(object):
         if document:
             document.delete()
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def serialize(self):
         """ serializes a Customer into a dictionary """
         customer = {"id": self.id,
@@ -144,7 +144,7 @@ class Customer(object):
             customer['_id'] = self.id
         return customer
 
-    @circuit
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def deserialize(self, data):
         """
         Deserializes a Customer from a dictionary
