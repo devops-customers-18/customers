@@ -24,6 +24,7 @@ Customer - A Customer used in the Customer Store
 import os
 import json
 import logging
+import time
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
