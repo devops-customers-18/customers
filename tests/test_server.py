@@ -53,6 +53,9 @@ class TestCustomerServer(unittest.TestCase):
                  email='a@b.com', username='kerker',
                  password='aa', phone_number='932',
                  active=True).save()
+        
+        if 'VCAP_SERVICES' in os.environ:
+            time.sleep(0.5)
 
         Customer(first_name='afido',
                  last_name='cat', address='ny',
@@ -60,10 +63,16 @@ class TestCustomerServer(unittest.TestCase):
                  password='ww', phone_number='9321',
                  active=True).save()
 
+        if 'VCAP_SERVICES' in os.environ:
+            time.sleep(0.5)
+
         Customer(first_name='redo', last_name='cat', address='ny',
                  email='x@z.com', username='haha',
                  password='qq', phone_number='233',
                  active=False).save()
+
+        if 'VCAP_SERVICES' in os.environ:
+            time.sleep(0.5)
 
         Customer(first_name='tedo', last_name='dog', address='nj',
                  email='e@z.com', username='kuku',
