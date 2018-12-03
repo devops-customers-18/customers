@@ -73,7 +73,7 @@ class Customer(object):
                               "phone_number": phone_number,
                               "active": active}
 
-    @retry(HTTPError, delay=2, backoff=3, tries=5)
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def create(self):
         """
         Creates a new Customer in the database POST
@@ -90,7 +90,7 @@ class Customer(object):
         if document.exists():
             self.id = str(document['_id'])
 
-    @retry(HTTPError, delay=2, backoff=3, tries=5)
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def update(self):
         """
         Updates a Customer in the database
@@ -103,7 +103,7 @@ class Customer(object):
             document.update(self.serialize())
             document.save()
 
-    @retry(HTTPError, delay=2, backoff=3, tries=5)
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def save(self):
         """
         Saves a Customer to the data store
@@ -144,7 +144,7 @@ class Customer(object):
             customer['_id'] = self.id
         return customer
 
-    @retry(HTTPError, delay=2, backoff=3, tries=5)
+    @retry(HTTPError, delay=1, backoff=2, tries=5)
     def deserialize(self, data):
         """
         Deserializes a Customer from a dictionary
@@ -181,6 +181,9 @@ class Customer(object):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
             document.delete()
+        
+        if 'VCAP_SERVICES' in os.environ:
+            time.sleep(0.5)
 
     @classmethod
     def all(cls):
