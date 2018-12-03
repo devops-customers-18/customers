@@ -176,12 +176,14 @@ class Customer(object):
 #  S T A T I C   D A T A B S E   M E T H O D S
 ######################################################################
 
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
             document.delete()
-
+    
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def all(cls):
         """ Query that returns all Customers """
@@ -195,6 +197,8 @@ class Customer(object):
 ######################################################################
 #  F I N D E R   M E T H O D S
 ######################################################################
+
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def find_by(cls, **kwargs):
         """ Find records using selector """
@@ -207,6 +211,7 @@ class Customer(object):
         # return [doc for doc in query.result]
         return results
 
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def find(cls, customer_id):
         """ Finds a Customer by it's ID """
@@ -216,6 +221,7 @@ class Customer(object):
         except KeyError:
             return None
 
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def find_by_query(cls, **kwargs):
         """ Returns the list of the Customers in a data list which
@@ -233,12 +239,14 @@ class Customer(object):
             if doc[key] == kwargs[key]:
                 results.append(customer)
         return results
-
+    
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def find_by_name(cls, username):
         """ Query that finds Pets by their name """
         return cls.find_by(username=username)
 
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @classmethod
     def find_by_address(cls, address):
         """ Query that finds Pets by their address """
@@ -248,6 +256,7 @@ class Customer(object):
 #  C L O U D A N T   D A T A B A S E   C O N N E C T I O N
 ############################################################
 
+    @retry(HTTPError, delay=2, backoff=3, tries=5)
     @staticmethod
     def init_db(dbname='customers', connect=True):
         """
