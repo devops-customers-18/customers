@@ -26,7 +26,6 @@ import json
 from flask_api import status    # HTTP Status Codes
 from service import app
 from service.models import Customer
-from time import sleep
 
 # Status Codes
 HTTP_200_OK = 200
@@ -66,26 +65,29 @@ class TestCustomerServer(unittest.TestCase):
                  password='qq', phone_number='233',
                  active=False).save()
 
+        Customer(first_name='tedo', last_name='dog', address='nj',
+                 email='e@z.com', username='kuku',
+                 password='ee', phone_number='423',
+                 active=False).save()
+
         self.app = app.test_client()
 
     def tearDown(self):
         """ Runs after each test """
         Customer.remove_all()
-        
+
     def test_index(self):
         """ Test the Home Page """
         resp = self.app.get('/')
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertIn('Customer Demo RESTful Service', resp.data)
-        sleep(0.5)
 
     def test_get_customer_list_without_queries(self):
         """ Get a list of Customer """
         resp = self.app.get('/customers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 3)
-        sleep(0.5)
+        self.assertEqual(len(data), 4)
 
     def test_get_a_customer(self):
         """ Find one customer """
@@ -103,13 +105,11 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(data['username'], 'Ker')
         self.assertEqual(data['password'], 'ww')
         self.assertEqual(data['phone_number'], '9321')
-        sleep(0.5)
 
     def test_get_customer_not_found(self):
         """ Get a Customer thats not found """
         resp = self.app.get('/customers/5')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        sleep(0.5)
 
     def test_create_customer(self):
         """ Create a customers """
@@ -123,7 +123,6 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
-        sleep(0.5)
 
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -145,7 +144,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), customers_count + 1)
         self.assertIn(new_json, data)
-        sleep(0.5)
 
     def test_create_customer_no_content_type(self):
         """ Create a Customer with no Content-Type """
@@ -157,7 +155,6 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.post('/customers', data=data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        sleep(0.5)
 
     def test_create_customer_form_content_type(self):
         """ Create a Customer with form Content-Type """
@@ -169,11 +166,11 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.post('/customers', data=new_customer, content_type='application/x-www-form-urlencoded')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
-        
+
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertIsNotNone(location)
-        sleep(0.5)
+
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['username'], 'foo111')
@@ -190,7 +187,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), customers_count + 1)
         self.assertIn(new_json, data)
-        sleep(0.5)
 
     def test_create_customer_with_no_name(self):
         """ Create a customer with the name missing """
@@ -201,7 +197,6 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        sleep(0.5)
 
     def test_spoof_customer_id(self):
         """ Create a customer passing in an id """
@@ -213,7 +208,6 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        sleep(0.5)
 
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -228,8 +222,7 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertNotEqual(new_json['_id'], 999)
-        sleep(0.5)
+        self.assertNotEqual(new_json['id'], 999)
 
     def test_update_customer(self):
         """ Update a customer """
@@ -243,7 +236,6 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        sleep(0.5)
 
         resp = self.app.get('/customers/{}'.format(customer['_id']))
         new_json = json.loads(resp.data)
@@ -254,7 +246,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        sleep(0.5)
 
     def test_update_customer_no_content_type(self):
         """ Update a customer Content-Type"""
@@ -267,7 +258,6 @@ class TestCustomerServer(unittest.TestCase):
         customer = self.get_customer('kerker')[0]
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        sleep(0.5)
 
     def test_update_customer_with_no_name(self):
         """ Update a customer with no username """
@@ -280,7 +270,6 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.put('/customers/{}'.format(customer['_id']), data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        sleep(0.5)
 
     def test_update_customer_not_found(self):
         """ Update a Customer that can't be found """
@@ -292,7 +281,6 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_man)
         resp = self.app.put('/customers/0', data=data, content_type='application/json')
         self.assertEquals(resp.status_code, status.HTTP_404_NOT_FOUND)
-        sleep(0.5)
 
     def test_disable_customer(self):
         """ Disable a customer """
@@ -300,26 +288,21 @@ class TestCustomerServer(unittest.TestCase):
 
         resp = self.app.put('/customers/{}/disable'.format(customer['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        sleep(0.5)
 
         resp = self.app.get('/customers/{}'.format(customer['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        sleep(0.5)
 
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['active'], 'False')
-        sleep(0.5)
 
     def test_disable_nonexisting_customer(self):
         resp = self.app.put('/customers/3/disable', content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        sleep(0.5)
 
     def test_disable_customer_no_content_type(self):
         """ Disable a customer no Content-Type"""
         resp = self.app.put('/customers/1/disable')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        sleep(0.5)
 
     def test_delete_customer(self):
         """ Delete a customer that exists """
@@ -328,32 +311,19 @@ class TestCustomerServer(unittest.TestCase):
         # delete a customer
         customer = self.get_customer('Ker')[0]  # returns a list
         resp = self.app.delete('/customers/{}'.format(customer['_id']), content_type='application/json')
-        sleep(0.5)
+
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         new_count = self.get_customers_count()
         self.assertEqual(new_count, customer_count - 1)
-        sleep(0.5)
 
     def test_get_customer_list_with_queries(self):
         """ Get Customers with queries """
 
         resp = self.app.get('/customers', query_string='address=ny')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(resp.data) >= 0)
-        # print(resp.data)
-        # self.assertTrue('fido' in resp.data)
-        # self.assertFalse('afido' in resp.data)
-        # data = json.loads(resp.data)
-        # query_item = data[0]
-        # self.assertEqual(query_item['username'], 'kerker')
-        # self.assertEqual(query_item['first_name'], 'fido')
-        # self.assertEqual(query_item['last_name'], 'dog')
-        # self.assertEqual(query_item['address'], 'ny')
-        # self.assertEqual(query_item['email'], 'a@b.com')
-        # self.assertEqual(query_item['password'], 'aa')
-        # self.assertEqual(query_item['phone_number'], '932')
-        sleep(0.5)
+        data = json.loads(resp.data)
+        self.assertEqual(len(data), 3)
 
     def test_call_create_with_an_id(self):
         """ Call create passing an id """
@@ -364,11 +334,11 @@ class TestCustomerServer(unittest.TestCase):
         data = json.dumps(new_customer)
         resp = self.app.post('/customers/1', data=data)
         self.assertEqual(resp.status_code, HTTP_405_METHOD_NOT_ALLOWED)
-        sleep(0.5)
 
 ######################################################################
 # Utility functions
 ######################################################################
+
     def get_customer(self, username):
         """ retrieves a pet for use in other actions """
         resp = self.app.get('/customers',
@@ -377,7 +347,7 @@ class TestCustomerServer(unittest.TestCase):
         self.assertGreater(len(resp.data), 0)
         self.assertIn(username, resp.data)
         data = json.loads(resp.data)
-        sleep(0.5)
+
         return data
 
     def get_customers_count(self):
@@ -385,7 +355,7 @@ class TestCustomerServer(unittest.TestCase):
         resp = self.app.get('/customers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        sleep(0.5)
+
         return len(data)
 
 

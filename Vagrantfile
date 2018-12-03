@@ -54,7 +54,7 @@ Vagrant.configure(2) do |config|
     apt-get install -y git zip tree python-pip python-dev
     apt-get -y autoremove
     pip install --upgrade pip
-
+    
     # Install PhantomJS for Selenium browser support
     echo "\n***********************************"
     echo " Installing PhantomJS for Selenium"

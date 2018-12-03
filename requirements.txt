@@ -32,3 +32,5 @@ selenium==3.3.1
 compare==0.2b0
 requests==2.13.0
 
+circuitbreaker==1.1.0
+
