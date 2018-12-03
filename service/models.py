@@ -24,6 +24,7 @@ Customer - A Customer used in the Customer Store
 import os
 import json
 import logging
+import time
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
@@ -215,6 +216,7 @@ class Customer(object):
         """ Finds a Customer by it's ID """
         try:
             document = cls.database[customer_id]
+            time.sleep(0.5)
             return Customer().deserialize(document)
         except KeyError:
             return None
@@ -235,6 +237,7 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
+        time.sleep(0.5)
         return results
 
     @classmethod
@@ -264,9 +267,6 @@ class Customer(object):
             Customer.logger.info('Running in Bluemix mode.')
             Customer.logger.info(os.environ['VCAP_SERVICES'])
             vcap_services = json.loads(os.environ['VCAP_SERVICES'])
-            Customer.logger.info("Mananananana")
-            Customer.logger.info(vcap_services)
-            print(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
             Customer.logger.info('Found Kubernetes Bindings')
@@ -282,14 +282,6 @@ class Customer(object):
                 "url": "http://" + CLOUDANT_HOST + ":5984/"
             }
             vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
-
-        # opts['username'] = vcap_services['username']
-        # opts['password'] = vcap_services['password']
-        # opts['host'] = vcap_services['host']
-        # opts['port'] = vcap_services['port']
-        # opts['url'] = vcap_services['url']
-        Customer.logger.info("Mananananana")
-        Customer.logger.info(vcap_services)
 
         # Look for Cloudant in VCAP_SERVICES
         for service in vcap_services:
