@@ -5,14 +5,17 @@ from flask import request, abort
 from flask_restful import Resource
 from flask_api import status
 from werkzeug.exceptions import BadRequest
-from service import app, api
+from service import app, api, apii, ns, Customer_model
 from service.models import Customer, DataValidationError
 from . import CustomerResource
 
-
+@ns.route('/', strict_slashes=False)
 class CustomerCollection(Resource):
     """ Handles all interactions with collections of Customers """
 
+    @ns.doc('query_customers')
+    @ns.response(404, 'Customer not found')
+    @ns.marshal_list_with(Customer_model)
     def get(self):
         """query and get the intersection of the queries.
         if there is no given query return all the list
@@ -59,6 +62,11 @@ class CustomerCollection(Resource):
             return_code = status.HTTP_200_OK
         return message, return_code
 
+    @ns.doc('create_customers')
+    @ns.expect(Customer_model)
+    @ns.response(400, 'The posted data was not valid')
+    @ns.response(201, 'Customer created successfully')
+    @ns.marshal_with(Customer_model, code=201)
     def post(self):
         """Create a customer in the database"""
         app.logger.info('Creating a new customer')
