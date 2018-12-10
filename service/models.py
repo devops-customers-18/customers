@@ -216,7 +216,6 @@ class Customer(object):
         """ Finds a Customer by it's ID """
         try:
             document = cls.database[customer_id]
-            time.sleep(0.5)
             return Customer().deserialize(document)
         except KeyError:
             return None
