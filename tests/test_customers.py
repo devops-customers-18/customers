@@ -33,16 +33,11 @@ from requests import HTTPError, ConnectionError
 ######################################################################
 
 VCAP_SERVICES = {
-    'cloudantNoSQLDB': [
-        {'credentials': {
-            'username': 'admin',
-            'password': 'pass',
-            'host': '127.0.0.1',
-            'port': 5984,
-            'url': 'http://admin:pass@127.0.0.1:5984'
-        }
-        }
-    ]
+    'username': 'admin',
+    'password': 'pass',
+    'host': '127.0.0.1',
+    'port': 5984,
+    'url': 'http://admin:pass@127.0.0.1:5984'
 }
 
 
