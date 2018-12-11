@@ -216,7 +216,6 @@ class Customer(object):
         """ Finds a Customer by it's ID """
         try:
             document = cls.database[customer_id]
-            time.sleep(0.5)
             return Customer().deserialize(document)
         except KeyError:
             return None
@@ -266,7 +265,9 @@ class Customer(object):
         if 'VCAP_SERVICES' in os.environ:
             Customer.logger.info('Running in Bluemix mode.')
             Customer.logger.info(os.environ['VCAP_SERVICES'])
-            vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+            creds = json.loads(os.environ['VCAP_SERVICES'])
+            vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
+            Customer.logger.info(vcap_services)
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
         elif 'BINDING_CLOUDANT' in os.environ:
             Customer.logger.info('Found Kubernetes Bindings')
