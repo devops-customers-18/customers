@@ -63,7 +63,10 @@ Customer_model = apii.model('Customer', {
     'password': fields.String(required=True,
                               description='The last password of a Customer'),
     'active': fields.String(required=True,
-                              description='The acive status of a Customer')
+                              description='The acive status of a Customer'),
+    'id': fields.Integer(required=True,
+                              description='The ID of a Customer'),
+
 })
 
 
