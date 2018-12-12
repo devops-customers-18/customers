@@ -31,20 +31,26 @@ from requests import HTTPError, ConnectionError
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-
-VCAP_SERVICES = {
-    'cloudantNoSQLDB': [
-        {'credentials': {
-            'username': 'admin',
-            'password': 'pass',
-            'host': '127.0.0.1',
-            'port': 5984,
-            'url': 'http://admin:pass@127.0.0.1:5984'
-        }
-        }
-    ]
-}
-
+if 'BLUEMIX_TEST' in os.environ:
+    VCAP_SERVICES = {
+        "cloudantNoSQLDB": [
+            {"credentials": os.environ['BINDING_CLOUDANT']
+            }
+        ]
+    }
+else:
+    VCAP_SERVICES = {
+        'cloudantNoSQLDB': [
+            {'credentials': {
+                'username': 'admin',
+                'password': 'pass',
+                'host': '127.0.0.1',
+                'port': 5984,
+                'url': 'http://admin:pass@127.0.0.1:5984'
+            }
+            }
+        ]
+    }
 ERROR_VCAP_SERVICES = {
     'cloudantNoSQLDB': [
         {'credentials': {
@@ -62,14 +68,16 @@ ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
 CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
 CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
 CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
-
-TEST_CREDS = {
-    "username": CLOUDANT_USERNAME,
-    "password": CLOUDANT_PASSWORD,
-    "host": CLOUDANT_HOST,
-    "port": 5984,
-    "url": "http://" + CLOUDANT_HOST + ":5984/"
-}
+if 'BLUEMIX_TEST' in os.environ:
+    TEST_CREDS = os.environ['BINDING_CLOUDANT']
+else:
+    TEST_CREDS = {
+        "username": CLOUDANT_USERNAME,
+        "password": CLOUDANT_PASSWORD,
+        "host": CLOUDANT_HOST,
+        "port": 5984,
+        "url": "http://" + CLOUDANT_HOST + ":5984/"
+    }
 
 if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
