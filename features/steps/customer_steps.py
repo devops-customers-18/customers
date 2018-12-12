@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions
 if 'VCAP_SERVICES' in environ:
     WAIT_SECONDS = 30
 else:
-    WAIT_SECONDS = 3
+    WAIT_SECONDS = 5
 
 
 @given('the following pets')
@@ -27,6 +27,7 @@ def step_impl(context):
     create_url = context.base_url + '/customers'
     for row in context.table:
         data = {
+            "id": row['id'],
             "first_name": row['first_name'],
             "last_name": row['last_name'],
             "address": row['address'],
@@ -63,10 +64,12 @@ def step_impl(context, element_name, text_string):
     if element_name == "id":
         headers = {'Content-Type': 'application/json'}
         resp = requests.get(context.base_url +'/customers')
-        id_int = int(text_string) - 1
-        text_string = resp.json()
-        element.send_keys(text_string[id_int]['_id'])
-        return
+        customer_lists = resp.json() # it's list of dictionary
+
+        # search a particular customer by its id
+        customers = filter(lambda data: data.get('id', 0) == int(text_string), customer_lists)
+        if customers:
+            text_string = customers[0]['_id']
     element.send_keys(text_string)
 
 ##################################################################
