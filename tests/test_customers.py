@@ -45,6 +45,32 @@ VCAP_SERVICES = {
     ]
 }
 
+ERROR_VCAP_SERVICES = {
+    'cloudantNoSQLDB': [
+        {'credentials': {
+            'username': 'admin',
+            'password': 'pass',
+            'host': '127.0.0.1',
+            'port': 5984,
+            'url': 'http://admin:pass@127.0.0.1:5984'
+        }
+        }
+    ]
+}
+
+ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
+CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
+CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
+CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
+
+TEST_CREDS = {
+    "username": CLOUDANT_USERNAME,
+    "password": CLOUDANT_PASSWORD,
+    "host": CLOUDANT_HOST,
+    "port": 5984,
+    "url": "http://" + CLOUDANT_HOST + ":5984/"
+}
+
 if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
 else:
@@ -164,7 +190,7 @@ class TestCustomers(unittest.TestCase):
     def test_deserialize_with_bad_data(self):
         """ Deserailize a Customer with bad data """
         customer = Customer()
-        self.assertRaises(DataValidationError, customer.deserialize, {"hey": 123})
+        self.assertRaises(DataValidationError, customer.deserialize, {"first_name": 123})
 
     def test_find_customer(self):
         """ Find a Customer by ID """
@@ -209,18 +235,74 @@ class TestCustomers(unittest.TestCase):
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].address, "USA")
 
-    # @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
-    # def test_vcap_services(self):
-    #     """ Test if VCAP_SERVICES works """
-    #     Customer.init_db()
-    #     self.assertIsNotNone(Customer.client)
-    #     Customer("fido", "dog", True).save()
-    #     time.sleep(WAIT_SECONDS)
-    #     customer = Customer.find_by_query(first_name="fido")
-    #     self.assertNotEqual(len(customer), 0)
-    #     self.assertEqual(customer[0].first_name, "fido")
+    @patch('cloudant.database.CloudantDatabase.__getitem__')
+    def test_key_error_on_delete(self, bad_key_mock):
+        """ Test KeyError on delete"""
+        bad_key_mock.side_effect = KeyError()
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
+        customer.save()
+        time.sleep(WAIT_SECONDS)
+        customer.delete()
+        time.sleep(WAIT_SECONDS)
 
+    @patch('cloudant.database.CloudantDatabase.__getitem__')
+    def test_key_error_on_delete(self, bad_key_mock):
+        """ Test KeyError on delete"""
+        bad_key_mock.side_effect = KeyError()
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
+        customer.save()
+        time.sleep(WAIT_SECONDS)
+        customer.delete()
+        time.sleep(WAIT_SECONDS)
 
+    @patch('cloudant.database.CloudantDatabase.__getitem__')
+    def test_key_error_on_update(self, bad_key_mock):
+        """ Test KeyError on update """
+        bad_key_mock.side_effect = KeyError()
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
+        customer.save()
+        time.sleep(WAIT_SECONDS)
+        customer.first_name = "k9"
+        customer.save()
+        time.sleep(WAIT_SECONDS)
+
+    @patch('cloudant.client.Cloudant.__init__')
+    def test_connection_error(self, bad_mock):
+        """ Test Connection error handler """
+        bad_mock.side_effect = ConnectionError()
+        self.assertRaises(AssertionError, Customer.init_db, 'test')
+
+    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES), })
+    def test_vcap_services(self):
+        """ Test if VCAP_SERVICES works """
+        Customer.init_db()
+        self.assertIsNotNone(Customer.client)
+        Customer("fido", "dog", True).save()
+        time.sleep(WAIT_SECONDS)
+        customer = Customer.find_by_query(first_name="fido")
+        self.assertNotEqual(len(customer), 0)
+        self.assertEqual(customer[0].first_name, "fido")
+
+    @patch.dict(os.environ, {'BINDING_CLOUDANT': json.dumps(TEST_CREDS), })
+    def test_binding_services(self):
+        """ Test if BINDING_CLOUDANT works """
+        Customer.init_db()
+        self.assertIsNotNone(Customer.client)
+        Customer("fido", "dog", True).save()
+        time.sleep(WAIT_SECONDS)
+        customer = Customer.find_by_query(first_name="fido")
+        self.assertNotEqual(len(customer), 0)
+        self.assertEqual(customer[0].first_name, "fido")
+
+    def test_not_vcap_services(self):
+        """ Test if no VCAP_SERVICES works """
+        Customer.init_db()
+        self.assertIsNotNone(Customer.client)
+        Customer("fido", "dog", True).save()
+        time.sleep(WAIT_SECONDS)
+        customer = Customer.find_by_query(first_name="fido")
+        self.assertNotEqual(len(customer), 0)
+        self.assertEqual(customer[0].first_name, "fido")
 
 ######################################################################
 #   M A I N
