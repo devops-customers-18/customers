@@ -20,6 +20,7 @@ Test cases can be run with:
   coverage report -m
 """
 
+import os
 import unittest
 import logging
 import json
@@ -60,7 +61,7 @@ class TestCustomerServer(unittest.TestCase):
                  email='a@b.com', username='kerker',
                  password='aa', phone_number='932',
                  active=True).save()
-        
+
         time.sleep(0.5)
 
         Customer(first_name='afido',
