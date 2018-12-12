@@ -51,23 +51,12 @@ else:
             }
         ]
     }
-ERROR_VCAP_SERVICES = {
-    'cloudantNoSQLDB': [
-        {'credentials': {
-            'username': 'admin',
-            'password': 'pass',
-            'host': '127.0.0.1',
-            'port': 5984,
-            'url': 'http://admin:pass@127.0.0.1:5984'
-        }
-        }
-    ]
-}
 
 ADMIN_PARTY = os.environ.get('ADMIN_PARTY', 'False').lower() == 'true'
 CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
 CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
 CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
+
 if 'BLUEMIX_TEST' in os.environ:
     TEST_CREDS = json.loads(os.environ['BINDING_CLOUDANT'])
 else:
@@ -131,6 +120,14 @@ class TestCustomers(unittest.TestCase):
         customers = Customer.all()
         time.sleep(WAIT_SECONDS)
         self.assertEqual(len(customers), 1)
+
+    @patch('cloudant.database.CloudantDatabase.create_document')
+    def test_create_customer_with_http_error(self, bad_mock):
+        """ Create a customer with http error """
+        bad_mock.side_effect = HTTPError()
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
+        customer.save()
+        time.sleep(WAIT_SECONDS)
 
     def test_update_a_customer(self):
         """ Update a Customer"""
@@ -242,16 +239,6 @@ class TestCustomers(unittest.TestCase):
         customers = Customer.find_by_query(address="USA")
         self.assertNotEqual(len(customers), 0)
         self.assertEqual(customers[0].address, "USA")
-
-    @patch('cloudant.database.CloudantDatabase.__getitem__')
-    def test_key_error_on_delete(self, bad_key_mock):
-        """ Test KeyError on delete"""
-        bad_key_mock.side_effect = KeyError()
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
-        customer.save()
-        time.sleep(WAIT_SECONDS)
-        customer.delete()
-        time.sleep(WAIT_SECONDS)
 
     @patch('cloudant.database.CloudantDatabase.__getitem__')
     def test_key_error_on_delete(self, bad_key_mock):
