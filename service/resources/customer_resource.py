@@ -64,12 +64,13 @@ class CustomerResource(Resource):
             abort(status.HTTP_404_NOT_FOUND, "Customer with id '{}' was not found.".format(customer_id))
 
         customer_info = request.get_json()
+        customer_info.pop("_id", None)
         try:
             customer.deserialize(customer_info)
         except DataValidationError as error:
             raise BadRequest(str(error))
 
-        customer.id = customer_id
+        customer._id = customer_id
         customer.save()
 
         message = customer.serialize()

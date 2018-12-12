@@ -64,7 +64,7 @@ class TestCustomers(unittest.TestCase):
 
     def test_create_a_customer(self):
         """ Create a customer and assert that it exists """
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         self.assertTrue(customer != None)
         self.assertEqual(customer.first_name, "Arturo")
         self.assertEqual(customer.last_name, "Frank")
@@ -74,6 +74,8 @@ class TestCustomers(unittest.TestCase):
         self.assertEqual(customer.password, "password")
         self.assertEqual(customer.phone_number, "1231231234")
         self.assertEqual(customer.active, True)
+        self.assertEqual(customer.id, 1)
+        self.assertEqual(customer._id, None)
         customer2 = Customer(first_name='ac',
                              last_name='bd',
                              username=None,
@@ -86,24 +88,22 @@ class TestCustomers(unittest.TestCase):
         customers = Customer.all()
         time.sleep(WAIT_SECONDS)
         self.assertEqual(customers, [])
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         self.assertTrue(customer != None)
-        self.assertEqual(customer.id, None)
+        self.assertEqual(customer._id, None)
         customer.save()
-        time.sleep(0.5)
-        # Asert that it was assigned an id and shows up in the database
-        self.assertNotEqual(customer.id, None)
         time.sleep(WAIT_SECONDS)
+        self.assertNotEqual(customer._id, None)
         customers = Customer.all()
         time.sleep(WAIT_SECONDS)
         self.assertEqual(len(customers), 1)
 
     def test_update_a_customer(self):
         """ Update a Customer"""
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         customer.save()
-        self.assertNotEqual(customer.id, None)
         time.sleep(WAIT_SECONDS)
+        self.assertNotEqual(customer._id, None)
         # Change it an save it
         customer.first_name = "k9"
         customer.save()
@@ -117,7 +117,7 @@ class TestCustomers(unittest.TestCase):
 
     def test_delete_a_customer(self):
         """ Delete a Customer"""
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         customer.save()
         time.sleep(WAIT_SECONDS)
         self.assertEqual(len(Customer.all()), 1)
@@ -127,7 +127,7 @@ class TestCustomers(unittest.TestCase):
 
     def test_serialize_a_customer(self):
         """ Test serialization of a Customer """
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         data = customer.serialize()
         self.assertNotEqual(data, None)
         self.assertNotIn('_id', data)
@@ -148,39 +148,37 @@ class TestCustomers(unittest.TestCase):
 
     def test_deserialize_a_customer(self):
         """ Test deserialization of a Customer """
-        data = {"first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True}
+        data = {"first_name": "Arturo", "last_name": "Frank", "address": "USA", "email": "abc@abc.com", "username": "IAmUser", "password": "password", "phone_number": "1231231234", "active": True, "id": 1}
         customer = Customer()
         customer.deserialize(data)
         self.assertNotEqual(customer, None)
-        self.assertEqual(customer.id, None)  # id should be ignored
+        self.assertEqual(customer._id, None)
         self.assertEqual(customer.first_name, "Arturo")
         self.assertEqual(customer.last_name, "Frank")
 
     def test_deserialize_with_no_data(self):
         """ Deserialize a Customer with no data """
         customer = Customer()
-        self.assertRaises(DataValidationError, customer.deserialize, None)
+        self.assertRaises(DataValidationError, customer.deserialize, {})
 
     def test_deserialize_with_bad_data(self):
         """ Deserailize a Customer with bad data """
         customer = Customer()
-        self.assertRaises(DataValidationError, customer.deserialize, "data")
+        self.assertRaises(DataValidationError, customer.deserialize, {"hey": 123})
 
     def test_find_customer(self):
         """ Find a Customer by ID """
-        Customer("Hey", "Jude").save()
-        saved_customer = Customer("kitty", "cat")
-        saved_customer.save()
-        customer = Customer.find(saved_customer.id)
+        customer = Customer("Hey", "Jude")
+        customer.save()
         time.sleep(WAIT_SECONDS)
+        saved_customer = Customer.find(customer._id)
         self.assertIsNot(customer, None)
-        self.assertEqual(customer.id, saved_customer.id)
-        self.assertEqual(customer.first_name, "kitty")
+        self.assertEqual(customer._id, saved_customer._id)
+        self.assertEqual(customer.first_name, "Hey")
 
     def test_customer_not_found(self):
         """ Test for a Customer that doesn't exist """
-        Customer("Arturo", "Frank").save()
-        customer = Customer.find("2")
+        customer = Customer.find('this_is_uuid')
         time.sleep(WAIT_SECONDS)
         self.assertIs(customer, None)
 
@@ -195,7 +193,7 @@ class TestCustomers(unittest.TestCase):
 
     def test_find_by_name(self):
         """ Find Customers by Username """
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         customer.save()
         time.sleep(WAIT_SECONDS)
         customers = Customer.find_by_query(username="IAmUser")
@@ -204,7 +202,7 @@ class TestCustomers(unittest.TestCase):
 
     def test_find_by_address(self):
         """ Find Customers by Address """
-        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True)
+        customer = Customer("Arturo", "Frank", "USA", "abc@abc.com", "IAmUser", "password", "1231231234", True, 1)
         customer.save()
         time.sleep(WAIT_SECONDS)
         customers = Customer.find_by_query(address="USA")
