@@ -37,7 +37,7 @@ apii = Api(app,
           version='3.0.0',
           title='Customer REST API Service ',
           description='This is a customer server.',
-          doc='/doc'
+          doc='/apidocs/index.html'
          )
 
 # This namespace is the start of the path i.e., /cutomers
