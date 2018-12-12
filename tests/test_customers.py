@@ -45,7 +45,7 @@ VCAP_SERVICES = {
     ]
 }
 
-if 'VCAP_SERVICES' in os.environ:
+if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
 else:
     WAIT_SECONDS = 0

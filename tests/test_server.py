@@ -38,7 +38,7 @@ HTTP_404_NOT_FOUND = 404
 HTTP_405_METHOD_NOT_ALLOWED = 405
 HTTP_409_CONFLICT = 409
 
-if 'VCAP_SERVICES' in os.environ:
+if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
 else:
     WAIT_SECONDS = 0
