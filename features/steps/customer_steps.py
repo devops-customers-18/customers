@@ -3,7 +3,7 @@ Pet Steps
 
 Steps file for Pet.feature
 """
-from os import getenv, environ
+import os
 import json
 import requests
 from behave import *
@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-if 'VCAP_SERVICES' in environ:
+if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 30
 else:
     WAIT_SECONDS = 5

@@ -37,7 +37,7 @@ CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
 CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
 CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
 
-if 'VCAP_SERVICES' in os.environ:
+if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
 else:
     WAIT_SECONDS = 0
@@ -181,15 +181,16 @@ class Customer(object):
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
+            time.sleep(WAIT_SECONDS)
             document.delete()
 
-        time.sleep(WAIT_SECONDS)
 
     @classmethod
     def all(cls):
         """ Query that returns all Customers """
         results = []
         for doc in cls.database:
+            time.sleep(WAIT_SECONDS)
             customer = Customer().deserialize(doc)
             results.append(customer)
         return results
