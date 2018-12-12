@@ -34,7 +34,7 @@ from requests import HTTPError, ConnectionError
 if 'BLUEMIX_TEST' in os.environ:
     VCAP_SERVICES = {
         "cloudantNoSQLDB": [
-            {"credentials": os.environ['BINDING_CLOUDANT']
+            {"credentials": json.loads(os.environ['BINDING_CLOUDANT'])
             }
         ]
     }
@@ -69,7 +69,7 @@ CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
 CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
 CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
 if 'BLUEMIX_TEST' in os.environ:
-    TEST_CREDS = os.environ['BINDING_CLOUDANT']
+    TEST_CREDS = json.loads(os.environ['BINDING_CLOUDANT'])
 else:
     TEST_CREDS = {
         "username": CLOUDANT_USERNAME,
