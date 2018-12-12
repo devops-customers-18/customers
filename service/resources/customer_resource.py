@@ -36,7 +36,6 @@ class CustomerResource(Resource):
         customer = Customer.find(customer_id)
         if customer:
             message = customer.serialize()
-            print(message)
             return_code = status.HTTP_200_OK
         else:
             message = {'error': 'Customer with id: %s was not found' % str(customer_id)}

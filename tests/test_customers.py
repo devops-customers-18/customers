@@ -169,7 +169,6 @@ class TestCustomers(unittest.TestCase):
     def test_find_customer(self):
         """ Find a Customer by ID """
         Customer("Hey", "Jude").save()
-        # saved_pet = Pet("kitty", "cat").save()
         saved_customer = Customer("kitty", "cat")
         saved_customer.save()
         customer = Customer.find(saved_customer.id)
