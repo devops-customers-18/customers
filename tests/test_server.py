@@ -20,6 +20,7 @@ Test cases can be run with:
   coverage report -m
 """
 
+import os
 import unittest
 import logging
 import json
@@ -36,6 +37,11 @@ HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_405_METHOD_NOT_ALLOWED = 405
 HTTP_409_CONFLICT = 409
+
+if 'VCAP_SERVICES' in os.environ:
+    WAIT_SECONDS = 0.5
+else:
+    WAIT_SECONDS = 0
 
 ######################################################################
 #  T E S T   C A S E S
@@ -55,7 +61,7 @@ class TestCustomerServer(unittest.TestCase):
                  password='aa', phone_number='932',
                  active=True).save()
         
-        time.sleep(0.5)
+        time.sleep(WAIT_SECONDS)
 
         Customer(first_name='afido',
                  last_name='cat', address='ny',
@@ -63,19 +69,20 @@ class TestCustomerServer(unittest.TestCase):
                  password='ww', phone_number='9321',
                  active=True).save()
 
-        time.sleep(0.5)
 
         Customer(first_name='redo', last_name='cat', address='ny',
                  email='x@z.com', username='haha',
                  password='qq', phone_number='233',
                  active=False).save()
+        time.sleep(WAIT_SECONDS)
 
-        time.sleep(0.5)
 
         Customer(first_name='tedo', last_name='dog', address='nj',
                  email='e@z.com', username='kuku',
                  password='ee', phone_number='423',
                  active=False).save()
+        time.sleep(WAIT_SECONDS)
+        time.sleep(WAIT_SECONDS)
 
         self.app = app.test_client()
 

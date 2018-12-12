@@ -3,7 +3,7 @@ Pet Steps
 
 Steps file for Pet.feature
 """
-from os import getenv
+from os import getenv, environ
 import json
 import requests
 from behave import *
@@ -12,8 +12,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-WAIT_SECONDS = 30
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
+if 'VCAP_SERVICES' in environ:
+    WAIT_SECONDS = 30
+else:
+    WAIT_SECONDS = 3
+
 
 @given('the following pets')
 def step_impl(context):

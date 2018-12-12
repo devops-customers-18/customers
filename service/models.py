@@ -36,6 +36,11 @@ CLOUDANT_HOST = os.environ.get('CLOUDANT_HOST', 'localhost')
 CLOUDANT_USERNAME = os.environ.get('CLOUDANT_USERNAME', 'admin')
 CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
 
+if 'VCAP_SERVICES' in os.environ:
+    WAIT_SECONDS = 0.5
+else:
+    WAIT_SECONDS = 0
+
 
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
@@ -182,9 +187,8 @@ class Customer(object):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
             document.delete()
-        
-        if 'VCAP_SERVICES' in os.environ:
-            time.sleep(0.5)
+
+        time.sleep(WAIT_SECONDS)
 
     @classmethod
     def all(cls):
@@ -236,7 +240,7 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
-        time.sleep(0.5)
+        time.sleep(WAIT_SECONDS)
         return results
 
     @classmethod
