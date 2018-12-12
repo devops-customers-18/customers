@@ -20,7 +20,6 @@ Test cases can be run with:
   coverage report -m
 """
 
-import os
 import unittest
 import logging
 import json
@@ -37,6 +36,7 @@ HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_405_METHOD_NOT_ALLOWED = 405
 HTTP_409_CONFLICT = 409
+
 
 if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
@@ -56,55 +56,32 @@ class TestCustomerServer(unittest.TestCase):
         self.app = app.test_client()
         Customer.init_db("tests")
         Customer.remove_all()
-        Customer(first_name='fido',
-                 last_name='dog',
-                 address='ny',
-                 email='a@b.com',
-                 username='kerker',
-                 password='aa',
-                 phone_number='932',
-                 active=True,
-                 id = 1
-        ).save()
-
-        time.sleep(WAIT_SECONDS)
+        Customer(first_name='fido', last_name='dog', address='ny',
+                 email='a@b.com', username='kerker',
+                 password='aa', phone_number='932',
+                 active=True).save()
+        
+        time.sleep(0.5)
 
         Customer(first_name='afido',
-                 last_name='cat',
-                 address='ny',
-                 email='c@b.com',
-                 username='Ker',
-                 password='ww',
-                 phone_number='9321',
-                 active=True,
-                 id = 2
-        ).save()
+                 last_name='cat', address='ny',
+                 email='c@b.com', username='Ker',
+                 password='ww', phone_number='9321',
+                 active=True).save()
 
-        time.sleep(WAIT_SECONDS)
+        time.sleep(0.5)
 
-        Customer(first_name='redo',
-                 last_name='cat',
-                 address='ny',
-                 email='x@z.com',
-                 username='haha',
-                 password='qq',
-                 phone_number='233',
-                 active=False,
-                 id = 3
-        ).save()
+        Customer(first_name='redo', last_name='cat', address='ny',
+                 email='x@z.com', username='haha',
+                 password='qq', phone_number='233',
+                 active=False).save()
 
-        time.sleep(WAIT_SECONDS)
+        time.sleep(0.5)
 
-        Customer(first_name='tedo',
-                 last_name='dog',
-                 address='nj',
-                 email='e@z.com',
-                 username='kuku',
-                 password='ee',
-                 phone_number='423',
-                 active=False,
-                 id = 4
-        ).save()
+        Customer(first_name='tedo', last_name='dog', address='nj',
+                 email='e@z.com', username='kuku',
+                 password='ee', phone_number='423',
+                 active=False).save()
 
         self.app = app.test_client()
 
@@ -141,11 +118,10 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(data['username'], 'Ker')
         self.assertEqual(data['password'], 'ww')
         self.assertEqual(data['phone_number'], '9321')
-        self.assertEqual(data['id'], 2)
 
     def test_get_customer_not_found(self):
         """ Get a Customer thats not found """
-        resp = self.app.get('/customers/ohno')
+        resp = self.app.get('/customers/5')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_customer(self):
@@ -156,7 +132,7 @@ class TestCustomerServer(unittest.TestCase):
         new_customer = {"username": "foo111", "password": "bar",
                         "first_name": "value1", "last_name": "value2",
                         "address": "Jersey", "phone_number": "773",
-                        "active": True, "email": "3333", "id": 5}
+                        "active": True, "email": "3333"}
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
@@ -174,7 +150,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertEqual(new_json['id'], 5)
 
         # check that count has gone up and includes sammy
         resp = self.app.get('/customers')
@@ -188,7 +163,7 @@ class TestCustomerServer(unittest.TestCase):
         new_customer = {"username": "foo111", "password": "bar",
                         "first_name": "value1", "last_name": "value2",
                         "address": "Jersey", "phone_number": "773",
-                        "active": True, "email": "3333", "id": 5}
+                        "active": True, "email": "3333"}
         data = json.dumps(new_customer)
 
         resp = self.app.post('/customers', data=data)
@@ -200,7 +175,7 @@ class TestCustomerServer(unittest.TestCase):
         new_customer = {"username": "foo111", "password": "bar",
                         "first_name": "value1", "last_name": "value2",
                         "address": "Jersey", "phone_number": "773",
-                        "active": True, "email": "3333", "id": 5}
+                        "active": True, "email": "3333"}
 
         resp = self.app.post('/customers', data=new_customer, content_type='application/x-www-form-urlencoded')
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
@@ -218,7 +193,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertEqual(new_json['id'], 5)
 
         # check that count has gone up and includes sammy
         resp = self.app.get('/customers')
@@ -238,12 +212,12 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_spoof_customer_id(self):
-        """ Create a customer passing in an _id """
+        """ Create a customer passing in an id """
         # add a new pet
         new_customer = {"username": "foo111", "password": "bar",
                         "first_name": "value1", "last_name": "value2", "id": 999,
                         "address": "Jersey", "phone_number": "773",
-                        "active": True, "email": "3333", "_id": "heyyoyoyoyoyoyoyoyo"}
+                        "active": True, "email": "3333"}
         data = json.dumps(new_customer)
         resp = self.app.post('/customers', data=data, content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
@@ -261,7 +235,7 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertNotEqual(new_json['_id'], "heyyoyoyoyoyoyoyoyo")
+        self.assertNotEqual(new_json['_id'], 999)
 
     def test_update_customer(self):
         """ Update a customer """
@@ -285,7 +259,6 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_json['email'], '3333')
         self.assertEqual(new_json['password'], 'bar')
         self.assertEqual(new_json['phone_number'], '773')
-        self.assertEqual(new_json['id'], 77)
 
     def test_update_customer_no_content_type(self):
         """ Update a customer Content-Type"""

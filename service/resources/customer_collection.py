@@ -89,12 +89,10 @@ class CustomerCollection(Resource):
                 'phone_number': request.form['phone_number'],
                 'active': request.form['active'],
                 'email': request.form['email'],
-                'id': request.form['id']
             }
         elif content_type == 'application/json':
             app.logger.info('Processing JSON data')
             data = request.get_json()
-            data.pop("_id", None)
         else:
             message = 'Unsupported Content-Type: {}'.format(content_type)
             app.logger.info(message)

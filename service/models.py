@@ -25,7 +25,6 @@ import os
 import json
 import logging
 import time
-import random
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from requests import HTTPError, ConnectionError
@@ -41,7 +40,6 @@ if 'VCAP_SERVICES' in os.environ or 'BINDING_CLOUDANT' in os.environ:
     WAIT_SECONDS = 0.5
 else:
     WAIT_SECONDS = 0
-
 
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
@@ -60,10 +58,9 @@ class Customer(object):
 
     def __init__(self, first_name='', last_name='',
                  address='', email='', username='', password='',
-                 phone_number='', active=True, id=0):
+                 phone_number='', active=True):
         """ Initialize a Customer. """
-        self.id = id
-        self._id = None
+        self.id = None
         self.first_name = first_name
         self.last_name = last_name
         self.address = address
@@ -72,6 +69,14 @@ class Customer(object):
         self.password = password
         self.phone_number = phone_number
         self.active = active
+        self.customer_dict = {"first_name": first_name,
+                              "last_name": last_name,
+                              "address": address,
+                              "email": email,
+                              "username": username,
+                              "passward": password,
+                              "phone_number": phone_number,
+                              "active": active}
 
     @retry(HTTPError, delay=1, backoff=2, tries=5)
     def create(self):
@@ -88,7 +93,7 @@ class Customer(object):
             return
 
         if document.exists():
-            self._id = str(document['_id'])
+            self.id = str(document['_id'])
 
     @retry(HTTPError, delay=1, backoff=2, tries=5)
     def update(self):
@@ -96,7 +101,7 @@ class Customer(object):
         Updates a Customer in the database
         """
         try:
-            document = self.database[self._id]
+            document = self.database[self.id]
         except KeyError:
             document = None
         if document:
@@ -110,7 +115,7 @@ class Customer(object):
         """
         if self.username is None:   # name is the only required field
             raise DataValidationError('name attribute is not set')
-        if self._id:
+        if self.id:
             self.update()
         else:
             self.create()
@@ -120,7 +125,7 @@ class Customer(object):
         """ Removes a Customer from the data store """
         # Customer.data.remove(self)
         try:
-            document = self.database[self._id]
+            document = self.database[self.id]
         except KeyError:
             document = None
         if document:
@@ -140,8 +145,8 @@ class Customer(object):
                     "active": self.active
                     }
 
-        if self._id:
-            customer['_id'] = self._id
+        if self.id:
+            customer['_id'] = self.id
         return customer
 
     @retry(HTTPError, delay=1, backoff=2, tries=5)
@@ -154,8 +159,6 @@ class Customer(object):
         """
         Customer.logger.info(data)
         try:
-            print("data is: ", data)
-            self.id = data.get("id", random.randint(5, 1000))
             self.first_name = data["first_name"]
             self.last_name = data["last_name"]
             self.address = data["address"]
@@ -169,8 +172,9 @@ class Customer(object):
         except TypeError as error:
             raise DataValidationError('Invalid customer: body of request contained bad or no data')
 
-        if "_id" in data:
-            self._id = data["_id"]
+        # if there is no id and the data has one, assign it
+        if not self.id and '_id' in data:
+            self.id = data['_id']
         return self
 
 ######################################################################
@@ -184,7 +188,6 @@ class Customer(object):
             time.sleep(WAIT_SECONDS)
             document.delete()
 
-
     @classmethod
     def all(cls):
         """ Query that returns all Customers """
@@ -192,6 +195,7 @@ class Customer(object):
         for doc in cls.database:
             time.sleep(WAIT_SECONDS)
             customer = Customer().deserialize(doc)
+            customer.id = doc['_id']
             results.append(customer)
         return results
 
@@ -235,7 +239,7 @@ class Customer(object):
             customer.deserialize(doc)
             if doc[key] == kwargs[key]:
                 results.append(customer)
-        time.sleep(WAIT_SECONDS)
+        time.sleep(0.5)
         return results
 
     @classmethod
