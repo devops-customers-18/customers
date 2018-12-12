@@ -3,7 +3,7 @@ Pet Steps
 
 Steps file for Pet.feature
 """
-from os import getenv, environ
+from os import getenv
 import json
 import requests
 from behave import *
@@ -12,11 +12,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-if 'VCAP_SERVICES' in environ:
-    WAIT_SECONDS = 30
-else:
-    WAIT_SECONDS = 5
-
+WAIT_SECONDS = 30
+BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
 
 @given('the following pets')
 def step_impl(context):
@@ -27,7 +24,6 @@ def step_impl(context):
     create_url = context.base_url + '/customers'
     for row in context.table:
         data = {
-            "id": row['id'],
             "first_name": row['first_name'],
             "last_name": row['last_name'],
             "address": row['address'],
@@ -45,11 +41,17 @@ def step_impl(context):
 def step_impl(context):
     """ Make a call to the base URL """
     context.driver.get(context.base_url)
+    #context.driver.save_screenshot('home_page.png')
 
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
+    #print(context)
+    #print(context.driver.message.name)
     expect(context.driver.title).to_contain(message)
+
+    #print()
+    #assert message in context.resp.data
 
 @then('I should not see "{message}"')
 def step_impl(context, message):
@@ -58,18 +60,22 @@ def step_impl(context, message):
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
+    #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
     element = context.driver.find_element_by_id(element_id)
+    #print(element.text)
     element.clear()
     if element_name == "id":
         headers = {'Content-Type': 'application/json'}
         resp = requests.get(context.base_url +'/customers')
-        customer_lists = resp.json() # it's list of dictionary
-
-        # search a particular customer by its id
-        customers = filter(lambda data: data.get('id', 0) == int(text_string), customer_lists)
-        if customers:
-            text_string = customers[0]['_id']
+        #print(resp.text)
+        id_int = int(text_string) - 1
+        text_string = resp.json()
+        #print(text_string[0]['_id']) 
+        #print(type(text_string))
+        element.send_keys(text_string[id_int]['_id'])
+        #print("customers_id: " + text_string[id_int]['_id'])
+        return
     element.send_keys(text_string)
 
 ##################################################################
@@ -81,6 +87,7 @@ def step_impl(context, element_name, text_string):
 ##################################################################
 @when('I select the "{checkbox}" option')
 def step_impl(context, checkbox):
+    # dropdown == 'active'
     print(checkbox)
     select_id = checkbox.lower()
     context.driver.find_element_by_id(select_id).click()
@@ -93,6 +100,9 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
+    #element = context.driver.find_element_by_id('search_results')
+    #print("1111" + element.text)
+    #expect(element.text).to_contain(name)
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
              (By.ID, 'search_results'),
@@ -109,6 +119,9 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
+    #element = context.driver.find_element_by_id('flash_message')
+    #expect(element.text).to_contain(message)
+
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
          expected_conditions.text_to_be_present_in_element(
              (By.ID, 'flash_message'),
@@ -126,7 +139,11 @@ def step_impl(context, message):
 
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
+    #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
+    #element = context.driver.find_element_by_id(element_id)
+    #print(element.text)
+    #expect(element.get_attribute('value')).to_equal(text_string)
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
          expected_conditions.text_to_be_present_in_element_value(
              (By.ID, element_id),
@@ -137,9 +154,21 @@ def step_impl(context, text_string, element_name):
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
+    #element_id = 'pet_' + element_name.lower()
     element_id = element_name.lower()
+    #element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
          expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
     element.send_keys(text_string)
+
+# @when('I change "{key}" to "{value}"')
+# def step_impl(context, key, value):
+#     context.data[key] = value
+
+# @then('I should see "{message}" in "{field}"')
+# def step_impl(context, message, field):
+#     """ Check a field for text """
+#     element = context.driver.find_element_by_id(field)
+#     assert message in element.text
